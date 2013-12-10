@@ -13,7 +13,7 @@ public class Receiver {
 	
 	public void receivePacket(DatagramPacket packet){
 		byte[] packetData = packet.getData();
-		Packet.PACKET_TYPE packetType = Packet.getPacketType(packet.getData());
+		Multicast.PACKET_TYPE packetType = Multicast.getPacketType(packet.getData());
 		switch(packetType){
 		case IMAGE: 
 			image(packetData);

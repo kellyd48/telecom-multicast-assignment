@@ -2,13 +2,17 @@ package Client;
 import java.util.Arrays;
 
 
-public class Packet {
+public class Multicast {
+	/*
+	 * Contains important constants for the Multicast Implementation.
+	 */
+	
 	public static final int MTU = 1024;
 	public static final int HEADER = 4;
 	public static final int DATA = MTU - HEADER;
 	//A hello packet contains this byte array in the header
 	public static final byte[] HELLO = {'*', 'H', 'I', '*'};
-	public static enum PACKET_TYPE {HELLO, IMAGE, UNKNOWN};
+	public static enum PACKET_TYPE {HELLO, IMAGE, IMAGE_METADATA, UNKNOWN};
 	
 	public static byte[] getHeader(byte[] packetData){
 		/*
