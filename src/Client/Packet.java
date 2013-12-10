@@ -3,7 +3,7 @@ import java.util.Arrays;
 
 
 public class Packet {
-	public static final int MTU = 1500;
+	public static final int MTU = 1024;
 	public static final int HEADER = 4;
 	public static final int DATA = MTU - HEADER;
 	//A hello packet contains this byte array in the header
