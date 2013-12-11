@@ -1,6 +1,4 @@
 package Client;
-import java.util.Arrays;
-
 
 public class Multicast {
 	/*
@@ -100,14 +98,12 @@ public class Multicast {
 		return header[0];
 	}
 	
-	
 	public static byte[] getHeaderData(byte[] header){
 		//returns the data from the header (ie. an ack or hello message)
 		byte[] headerData = new byte[HEADER_DATA];
 		System.arraycopy(header, PACKET_IDENTIFIER, headerData, 0, headerData.length);
 		return headerData;
 	}
-	
 	
 	public static byte[] getData(byte[] packetData){
 		/*
@@ -116,5 +112,14 @@ public class Multicast {
 		byte[] data = new byte[DATA];
 		System.arraycopy(packetData, HEADER, data, 0, DATA);
 		return data;
+	}
+
+	public static byte[] nextAck(byte[] ack){
+		byte[] newAck = new byte[ack.length];
+		if(ack[0] == 0)
+			ack[0] = 1;
+		else
+			ack[0] = 0;
+		return newAck;
 	}
 }

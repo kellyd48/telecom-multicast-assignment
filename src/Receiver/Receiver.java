@@ -1,8 +1,6 @@
 package Receiver;
 import Client.*;
 
-import java.net.DatagramPacket;
-
 public class Receiver {
 	
 	public static enum RECEIVER_STATE {RECEIVING_IMAGE, FINISHED_RECEIVING, ERROR};
@@ -11,9 +9,8 @@ public class Receiver {
 		
 	}
 	
-	public void receivePacket(DatagramPacket packet){
-		byte[] packetData = packet.getData();
-		Multicast.PACKET_TYPE packetType = Multicast.getPacketType(packet.getData());
+	public void receivePacket(byte[] packetData){
+		Multicast.PACKET_TYPE packetType = Multicast.getPacketType(packetData);
 		switch(packetType){
 		case IMAGE: 
 			image(packetData);

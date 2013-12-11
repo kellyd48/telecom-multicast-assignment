@@ -40,12 +40,16 @@ public class Client {
 	 */
 	private class Send extends Thread {
 		Sender s = new Sender();
-		
+		DatagramPacket packet;
 		@Override
 		public void run() {
 			try {
-				if(s.hasPacketToSend())
-					socket.send(s.packetToSend());
+				s.run();
+				if(s.hasPacketToSend()){
+					byte[] packetData = s.packetToSend();
+					packet = new DatagramPacket(packetData, packetData.length, address, MCAST_PORT);
+					socket.send(packet);
+				}	
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -66,7 +70,7 @@ public class Client {
 		public void run() {
 			for(;;) {
 				socket.receive(p);
-				r.receivePacket(packet);
+				r.receivePacket(p.getData());
 			}
 		}
 	}
