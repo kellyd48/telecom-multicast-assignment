@@ -25,10 +25,10 @@ public class Client {
 			socket.joinGroup(address);
 			
 			/* Create and start the threads */
-			Send t1 = new Send();
-			t1.start();
-			Listener t2 = new Listener();
-			t2.start();	
+			Send s = new Send();
+			s.start();
+			Listener l = new Listener();
+			l.start();	
 		}
 		catch(Exception e) {
 			e.printStackTrace();
