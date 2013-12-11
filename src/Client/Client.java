@@ -15,6 +15,9 @@ public class Client {
 	private MulticastSocket socket;
 	private InetAddress address;
 	
+	/**
+	 * Client Constructor
+	 */
 	public Client() {
 		try {
 			address = InetAddress.getByName(MCAST_ADDR);
@@ -31,7 +34,7 @@ public class Client {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-	}
+	} // end constructor
 	
 	/**
 	 * Sender Thread
@@ -54,8 +57,8 @@ public class Client {
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-	}
+		} // end run
+	} // end Send
 	
 	/**
 	 * Listener thread
@@ -65,14 +68,21 @@ public class Client {
 	private class Listener extends Thread {
 		Receiver r = new Receiver();
 		
-		DatagramPacket p = new DatagramPacket(address);
 		@Override
 		public void run() {
-			for(;;) {
-				socket.receive(p);
-				r.receivePacket(p.getData());
+			try {
+				DatagramPacket p = null;
+				byte[] data= new byte[Multicast.MTU];  
+				for(;;) {
+					p = new DatagramPacket(data, data.length);
+					socket.receive(p);
+					r.receivePacket(p.getData());
+				}
 			}
-		}
-	}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		} // end run
+	} // end Listener 
 
-}
+} // end Client
