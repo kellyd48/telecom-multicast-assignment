@@ -2,6 +2,10 @@ package Client;
 
 import java.net.InetAddress;
 
+/**
+ * Represents a client that is a member of the multicast group.
+ *
+ */
 public class ClientNode {
 	private InetAddress address;
 	private int port;
@@ -19,5 +23,7 @@ public class ClientNode {
 		return port;
 	}
 	
-	
+	public String toString(){
+		return "Address: " + address.getHostAddress() + " Port: " + port;
+	}
 }
