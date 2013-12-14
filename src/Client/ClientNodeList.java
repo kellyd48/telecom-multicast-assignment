@@ -28,8 +28,10 @@ public class ClientNodeList {
 		 * Adds a ClientNode to the list of nodes.
 		 * Does nothing if node already present.
 		 */
-		if(!clientNodeLookup(node))
+		if(!clientNodeLookup(node)){
 			nodeList.put(generateKey(node), node);
+			System.out.println("Added node address: " + node.getAddress().toString() + " port: "+node.getPort());
+		}
 	}
 	
 	public void remove(ClientNode node){
