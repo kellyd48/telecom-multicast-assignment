@@ -8,17 +8,21 @@ import Receiver.Receiver;
 import Sender.Sender;
 
 public class Client {
-	
 	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
 	public static final int MCAST_PORT = 9013; // hardcoded port number for the multicast group
+	public static final int HELLO_TIME_INTERVAL = 10;
+	public static final int NUMBER_OF_PACKETS_PER_HELLO = 2;
+	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE};
 	
 	private MulticastSocket socket;
 	private InetAddress address;
+	private CLIENT_STATE state;
 	
 	/**
 	 * Client Constructor
 	 */
 	public Client() {
+		state = CLIENT_STATE.JOIN_GROUP;
 		try {
 			address = InetAddress.getByName(MCAST_ADDR);
 			socket = new MulticastSocket(MCAST_PORT);
@@ -46,6 +50,38 @@ public class Client {
 		DatagramPacket packet;
 		@Override
 		public void run() {
+			switch(state){
+			case JOIN_GROUP:
+				sendHello();
+				break;
+			case LISTENING:
+				break;
+			case SENDING_IMAGE:
+				runSender(s);
+			case RECEIVING_IMAGE:
+				break;
+			default:
+				break;
+			}
+			runSender(s);
+		} // end run
+		
+		public void sendHello(){
+			try{
+				byte[] helloPacket = Multicast.constructHelloPacket();
+				DatagramPacket packet = new DatagramPacket(helloPacket, helloPacket.length, address, MCAST_PORT);
+				for(int i = 0; i < NUMBER_OF_PACKETS_PER_HELLO; i++){
+					socket.send(packet);
+					sleep(HELLO_TIME_INTERVAL);
+				}
+			}catch(IOException e){
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void runSender(Sender s){
 			try {
 				s.run();
 				if(s.hasPacketToSend()){
@@ -57,7 +93,7 @@ public class Client {
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-		} // end run
+		}
 	} // end Send
 	
 	/**

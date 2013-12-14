@@ -4,7 +4,7 @@ import Client.*;
 
 public class Sender {
 
-	public static enum SENDER_STATE {SEND_METADATA, SEND_IMAGE, SEND_HELLO, ERROR};
+	public static enum SENDER_STATE {WAIT_FOR_IMAGE, SEND_METADATA, SEND_IMAGE, ERROR};
 	
 	private byte[] packetToSend = null;
 	private byte[] lastPacketSent = null;
@@ -12,7 +12,7 @@ public class Sender {
 	private SENDER_STATE state;
 	
 	public Sender(){
-		state = SENDER_STATE.SEND_HELLO;
+		state = SENDER_STATE.WAIT_FOR_IMAGE;
 		//initialise ack byte array
 		for(int i = 0; i < ackToSend.length; i++)
 			ackToSend[i] = 0;
@@ -20,8 +20,7 @@ public class Sender {
 	
 	public void run(){
 		switch(state){
-		case SEND_HELLO:
-			packetToSend = Multicast.constructHelloPacket();
+		case WAIT_FOR_IMAGE:
 			break;
 		case SEND_METADATA:
 			break;
