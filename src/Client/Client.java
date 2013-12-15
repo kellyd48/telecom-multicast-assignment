@@ -4,10 +4,10 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import tcdIO.*;
+
 import Receiver.Receiver;
 import Sender.Sender;
-
-import tcdIO.*;
 
 public class Client {
 	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
@@ -52,9 +52,8 @@ public class Client {
 	public void run(){
 		try {
 			/* Start the threads for sending and receiving */
-			l.start();	
 			s.start();
-			wait(200);
+			l.start();	
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -150,7 +149,7 @@ public class Client {
 	 *
 	 */
 	private class Listener extends Thread {
-		private Receiver r;
+		Receiver r;
 		
 		/**
 		 * Listener Constructor

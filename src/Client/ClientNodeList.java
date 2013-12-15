@@ -36,7 +36,7 @@ public class ClientNodeList {
 		 */
 		if(!clientNodeLookup(node) && !myID.equals(node.getID())){
 			nodeList.put(node.getID().getIdentifier(), node);
-			// terminal.println("RECEIVED");
+			terminal.println("RECEIVED");
 			terminal.println(node.toString());
 		}
 	}
