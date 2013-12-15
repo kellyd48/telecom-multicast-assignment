@@ -34,14 +34,14 @@ public class Identifier {
 	}
 	
 	/**
-	 * Returns the identification code.
+	 * Returns the identification code as an integer.
 	 */
 	public int getIdentifier(){
 		return this.identifier;
 	}
 	
 	/**
-	 * Returns id based on hash of current timestamp. (id is an integer)
+	 * Returns id constructed from hash of current timestamp. (id is an integer)
 	 */
 	private int getTimestampID(){
 		Date date = new Date();
@@ -50,10 +50,9 @@ public class Identifier {
 	}
 	
 	/**
+	 * Takes array of Identifier bytes and converts it to integer form.
 	 * @param byte array
 	 * @return integer
-	 * 
-	 * Takes array of Identifier bytes and converts it to integer form.
 	 */
 	private static int toInt(byte[] bytes){
 		assert(bytes.length == IDENTIFIER_LENGTH);
@@ -66,9 +65,8 @@ public class Identifier {
 	}
 	
 	/**
-	 * @return byte array
-	 * 
 	 * Converts id internally stored as an int into an array of bytes.
+	 * @return byte array
 	 */
 	public byte[] toBytes(){
 		byte[] identifier = new byte[BYTES_PER_INT];
@@ -79,6 +77,7 @@ public class Identifier {
 	} 
 
 	/**
+	 * Checks if two Identifier objects are equal.
 	 * @param Identifier otherID
 	 * @return Returns boolean true or false whether the ID's are equal.
 	 */
