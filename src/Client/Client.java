@@ -1,13 +1,12 @@
 package Client;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-
-import tcdIO.*;
-
 import Receiver.Receiver;
 import Sender.Sender;
+import tcdIO.*;
 
 public class Client {
 	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
