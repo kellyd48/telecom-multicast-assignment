@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import tcdIO.*;
 
 /**
  * Interface to manage a group of ClientNode members on a multicast network.
@@ -13,8 +14,10 @@ public class ClientNodeList {
 	private HashMap<Integer, ClientNode> nodeList;
 	//Don't add this ID because it's the local client ID
 	private Identifier myID;
+	private Terminal terminal;
 	
-	public ClientNodeList(Identifier ID){
+	public ClientNodeList(Identifier ID,Terminal terminal){
+		this.terminal = terminal;
 		nodeList = new HashMap<Integer, ClientNode>();
 		myID = new Identifier(ID);
 	}
@@ -33,7 +36,8 @@ public class ClientNodeList {
 		 */
 		if(!clientNodeLookup(node) && !myID.equals(node.getID())){
 			nodeList.put(node.getID().getIdentifier(), node);
-			System.out.println(node.toString());
+			terminal.println("RECEIVED");
+			terminal.println(node.toString());
 		}
 	}
 	
