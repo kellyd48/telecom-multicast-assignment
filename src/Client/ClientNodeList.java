@@ -11,16 +11,19 @@ import java.util.Set;
  */
 public class ClientNodeList {
 	private HashMap<Integer, ClientNode> nodeList;
+	//Don't add this ID because it's the local client ID
+	private Identifier myID;
 	
-	public ClientNodeList(){
+	public ClientNodeList(Identifier ID){
 		nodeList = new HashMap<Integer, ClientNode>();
+		myID = new Identifier(ID);
 	}
 	
 	public boolean clientNodeLookup(ClientNode node){
 		/*
 		 * Returns boolean for whether a ClientNode is contained in the list of nodes.
 		 */
-		return nodeList.containsKey(generateKey(node));
+		return nodeList.containsKey(node.getID().getIdentifier());
 	}
 	
 	public void add(ClientNode node){
@@ -28,9 +31,9 @@ public class ClientNodeList {
 		 * Adds a ClientNode to the list of nodes.
 		 * Does nothing if node already present.
 		 */
-		if(!clientNodeLookup(node)){
-			nodeList.put(generateKey(node), node);
-			System.out.println("Added node address: " + node.getAddress().toString() + " port: "+node.getPort());
+		if(!clientNodeLookup(node) && !myID.equals(node.getID())){
+			nodeList.put(node.getID().getIdentifier(), node);
+			System.out.println(node.toString());
 		}
 	}
 	
@@ -40,7 +43,7 @@ public class ClientNodeList {
 		 * Does nothing if node is not present.
 		 */
 		if(clientNodeLookup(node))
-			nodeList.remove(generateKey(node));
+			nodeList.remove(node.getID().getIdentifier());
 	}
 	
 	public ClientNode get(int index){
@@ -63,14 +66,6 @@ public class ClientNodeList {
 		 * Returns the size of the list
 		 */
 		return nodeList.size();
-	}
-	
-	private Integer generateKey(ClientNode node){
-		/*
-		 * Generates a key to map to a value.
-		 */
-		byte[] address = node.getAddress().getAddress();
-		return address[2] + address[3] + node.getPort();
 	}
 	
 	public String toString(){

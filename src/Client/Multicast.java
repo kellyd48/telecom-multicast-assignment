@@ -1,16 +1,16 @@
 package Client;
 
+/**
+ * Contains important constants and useful methods for the Multicast Implementation.
+ *
+ */
 public class Multicast {
-	/*
-	 * Contains important constants and useful methods for the Multicast Implementation.
-	 */
-	
 	/*
 	 * Data In Packet looks like this
 	 * | HEADER |      DATA     |
 	 * 
-	 * HEADER = 4 bytes
-	 * | PACKET_IDENTIFIER 1 byte long | HEADER_DATA 3 bytes long | 
+	 * HEADER = 8 bytes
+	 * | PACKET_IDENTIFIER 1 byte | HEADER_DATA 3 bytes | CLIENT_IDENTIFIER 4 bytes
 	 * 
 	 * DATA = remaining 1020 bytes
 	 * 
@@ -18,10 +18,16 @@ public class Multicast {
 	
 	// Length in bytes of the various components of the packet.
 	public static final int MTU = 1024;
-	public static final int HEADER = 4;
+	public static final int HEADER_INDEX = 0;
+	public static final int HEADER = 8;
+	public static final int PACKET_IDENTIFIER_INDEX = 0;
 	public static final int PACKET_IDENTIFIER = 1;
-	public static final int HEADER_DATA = HEADER - PACKET_IDENTIFIER;
+	public static final int HEADER_DATA_INDEX = 1;
+	public static final int HEADER_DATA = 3;
+	public static final int CLIENT_IDENTIFIER_INDEX = 4;
+	public static final int CLIENT_IDENTIFIER = 4;
 	public static final int ACK_LENGTH = HEADER_DATA;
+	public static final int DATA_INDEX = 8;
 	public static final int DATA = MTU - HEADER;
 	//A hello packet contains this byte array in the header
 	public static final byte[] HELLO = {'H', 'I', '!'};
@@ -48,35 +54,52 @@ public class Multicast {
 		}
 	}
 
-	public static byte[] constructHelloPacket(){
+	public static byte[] constructHelloPacket(Identifier ID){
 		// returns byte array to be sent as a hello packet
 		byte[] packet = new byte[MTU];
-		packet[0] = HELLO_IDENTIFIER;
-		System.arraycopy(HELLO, 0, packet, PACKET_IDENTIFIER, HEADER_DATA);
+		//Insert Packet Identifier.
+		packet[PACKET_IDENTIFIER_INDEX] = HELLO_IDENTIFIER;
+		//Insert Hello Code
+		System.arraycopy(HELLO, 0, packet, HEADER_DATA_INDEX, HEADER_DATA);
+		//Insert Client Identifier
+		System.arraycopy(ID.toBytes(), 0, packet, CLIENT_IDENTIFIER_INDEX, CLIENT_IDENTIFIER);
 		return packet;
 	}
 
-	public static byte[] constructImagePacket(byte[] ack, byte[] imageData){
+	public static byte[] constructImagePacket(Identifier ID, byte[] ack, byte[] imageData){
 		/*
 		 * Constructs an image packet when given an ack and the image data.
 		 */
-		byte[] imagePacket = new byte[MTU];
-		imagePacket[0] = IMAGE_IDENTIFIER;
-		System.arraycopy(ack, 0, imagePacket, PACKET_IDENTIFIER, ACK_LENGTH);
-		System.arraycopy(imageData, 0, imagePacket, HEADER, DATA);
-		return imagePacket;
+		byte[] packet = new byte[MTU];
+		//Insert Packet Identifier.
+		packet[PACKET_IDENTIFIER_INDEX] = IMAGE_IDENTIFIER;
+		//Insert ack
+		assert(ack.length == ACK_LENGTH);
+		System.arraycopy(ack, 0, packet, HEADER_DATA_INDEX, ACK_LENGTH);
+		//Insert Client Identifier
+		System.arraycopy(ID.toBytes(), 0, packet, CLIENT_IDENTIFIER_INDEX, CLIENT_IDENTIFIER);
+		//Insert Image Data
+		assert(imageData.length == DATA);
+		System.arraycopy(imageData, 0, packet, DATA_INDEX, DATA);
+		return packet;
 	}
 
-	public static byte[] constructImageMetadataPacket(byte[] ack, int imageSize){
+	public static byte[] constructImageMetadataPacket(Identifier ID, byte[] ack, int imageSize){
 		/*
 		 * Takes an ack and metadata (image length) and constructs an image metadata packet.
 		 */
-		byte[] metadataPacket = new byte[MTU];
-		metadataPacket[0] = IMAGE_METADATA_IDENTIFIER;
-		System.arraycopy(ack, 0, metadataPacket, PACKET_IDENTIFIER, ACK_LENGTH);
+		byte[] packet = new byte[MTU];
+		//Insert Packet Identifier.
+		packet[PACKET_IDENTIFIER_INDEX] = IMAGE_METADATA_IDENTIFIER;
+		//Insert ack
+		assert(ack.length == ACK_LENGTH);
+		System.arraycopy(ack, 0, packet, HEADER_DATA_INDEX, ACK_LENGTH);
+		//Insert Client Identifier
+		System.arraycopy(ID.toBytes(), 0, packet, CLIENT_IDENTIFIER_INDEX, CLIENT_IDENTIFIER);
+		//Insert metadata
 		byte[] metadata = (Integer.toString(imageSize)).getBytes();
-		System.arraycopy(metadata, 0, metadataPacket, HEADER, metadata.length);
-		return metadataPacket;
+		System.arraycopy(metadata, 0, packet, HEADER, metadata.length);
+		return packet;
  	}
 	
 	public static int getImageSizeFromMetadata(byte[] metadata){
@@ -89,19 +112,25 @@ public class Multicast {
 		 * Returns the header from the data contained in a packet.
 		 */
 		byte[] header = new byte[HEADER];
-		System.arraycopy(packetData, 0, header, 0, HEADER);
+		System.arraycopy(packetData, HEADER_INDEX, header, 0, HEADER);
 		return header;
 	}
 	
 	public static byte getPacketIdentifier(byte[] header){
 		// returns the byte identifying what the type of packet is
-		return header[0];
+		return header[PACKET_IDENTIFIER_INDEX];
+	}
+	
+	public static byte[] getClientIdentifier(byte[] packetData){
+		byte[] clientIdentifier = new byte[CLIENT_IDENTIFIER];
+		System.arraycopy(packetData, CLIENT_IDENTIFIER_INDEX, clientIdentifier, 0, CLIENT_IDENTIFIER);
+		return clientIdentifier;
 	}
 	
 	public static byte[] getHeaderData(byte[] header){
 		//returns the data from the header (ie. an ack or hello message)
 		byte[] headerData = new byte[HEADER_DATA];
-		System.arraycopy(header, PACKET_IDENTIFIER, headerData, 0, headerData.length);
+		System.arraycopy(header, HEADER_DATA_INDEX, headerData, 0, HEADER_DATA);
 		return headerData;
 	}
 	
@@ -110,7 +139,7 @@ public class Multicast {
 		 * Returns the data minus the header from the packet data.
 		 */
 		byte[] data = new byte[DATA];
-		System.arraycopy(packetData, HEADER, data, 0, DATA);
+		System.arraycopy(packetData, DATA_INDEX, data, 0, DATA);
 		return data;
 	}
 

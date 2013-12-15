@@ -13,33 +13,25 @@ import Sender.Sender;
 public class Client {
 	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
 	public static final int MCAST_PORT = 9013; // hardcoded port number for the multicast group
-	public static final int DEFAULT_SRC_PORT = 10000;
 	public static final int HELLO_TIME_INTERVAL = 10;
 	public static final int NUMBER_OF_PACKETS_PER_HELLO = 2;
 	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE};
 	
 	private MulticastSocket mSocket;
-	private DatagramSocket dSocket;
 	private InetAddress address;
 	private CLIENT_STATE state;
 	private ClientNodeList clientNodeList;
+	private Identifier ID;
 	private Send s;
 	private Listener l;
 	
-	
 	/**
 	 * Client Constructor
 	 */
-	public Client(){
-		this(DEFAULT_SRC_PORT);
-	}
-	
-	/**
-	 * Client Constructor
-	 */
-	public Client(int srcPort) {
+	public Client() {
+		ID = new Identifier();
 		state = CLIENT_STATE.JOIN_GROUP;
-		clientNodeList = new ClientNodeList();
+		clientNodeList = new ClientNodeList(ID);
 		// create send and listener objects
 		s = new Send();
 		l = new Listener();
@@ -47,7 +39,6 @@ public class Client {
 			address = InetAddress.getByName(MCAST_ADDR);
 			mSocket = new MulticastSocket(MCAST_PORT);
 			mSocket.joinGroup(address);
-			dSocket = new DatagramSocket(srcPort);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -69,7 +60,7 @@ public class Client {
 	public static void main(String[] args){
 		Client client1 = new Client();
 		client1.run();
-		Client client2 = new Client(50001);
+		Client client2 = new Client();
 		client2.run();
 	}
 	
@@ -88,7 +79,7 @@ public class Client {
 		
 		@Override
 		public void run() {
-			System.out.println("\n\nClient sender with source port: " + dSocket.getPort() + "\n");
+			System.out.println("Client ID: " + ID.toString());
 			switch(state){
 			case JOIN_GROUP:
 				sendHello();
@@ -107,11 +98,11 @@ public class Client {
 		
 		public synchronized void sendHello(){
 			try{
-				byte[] helloPacket = Multicast.constructHelloPacket();
+				byte[] helloPacket = Multicast.constructHelloPacket(ID);
 				DatagramPacket packet = new DatagramPacket(helloPacket, helloPacket.length, address, MCAST_PORT);
 				for(int i = 0; i < NUMBER_OF_PACKETS_PER_HELLO; i++){
-					dSocket.send(packet);
-					System.out.println("Sent Hello Packet.");
+					mSocket.send(packet);
+					System.out.println("Client ID: " + ID.toString() + " Sent Hello Packet.");
 					sleep(HELLO_TIME_INTERVAL);
 				}
 			}catch(IOException e){
@@ -145,7 +136,7 @@ public class Client {
 		Receiver r = new Receiver();
 		@Override
 		public void run() {
-			System.out.println("Client receiver with source port: " + dSocket.getPort());
+			System.out.println("Client receiver with ID: " + ID.toString());
 			receivePacket();			
 		} // end run
 		
@@ -159,7 +150,9 @@ public class Client {
 					byte[] packetData = p.getData();
 					switch(Multicast.getPacketType(packetData)){
 					case HELLO:
-						receiveHello(p.getAddress(), p.getPort());
+						Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
+						receiveHello(p.getAddress(), p.getPort(), identifier);
+						break;
 					case IMAGE:
 					case IMAGE_METADATA:
 						r.receivePacket(p.getData());
@@ -174,8 +167,8 @@ public class Client {
 			}
 		}
 		
-		public void receiveHello(InetAddress address, int port){
-			ClientNode node = new ClientNode(address, port);
+		public void receiveHello(InetAddress address, int port, Identifier identifier){
+			ClientNode node = new ClientNode(address, port, identifier);
 			clientNodeList.add(node);
 		}
 		
