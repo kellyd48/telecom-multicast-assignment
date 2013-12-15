@@ -12,7 +12,7 @@ import Sender.Sender;
 public class Client {
 	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
 	public static final int MCAST_PORT = 9013; // hardcoded port number for the multicast group
-	public static final int HELLO_TIME_INTERVAL = 10;
+	public static final int HELLO_TIME_INTERVAL = 100;
 	public static final int NUMBER_OF_PACKETS_PER_HELLO = 2;
 	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE};
 	
