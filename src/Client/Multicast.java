@@ -117,8 +117,10 @@ public class Multicast {
 		return packet;
  	}
 	
-	public static int getImageSizeFromMetadata(byte[] metadata){
+	public static int getImageSizeMetadataPacket(byte[] packetData){
 		// returns the size of an image in bytes from the metadata given.
+		assert(packetData.length == MTU);
+		byte[] metadata = getHeaderData(packetData);
 		return Integer.valueOf(new String(metadata, 0, metadata.length).trim()).intValue();
 	}
 
@@ -131,9 +133,10 @@ public class Multicast {
 		return header;
 	}
 	
-	public static byte getPacketIdentifier(byte[] header){
+	public static byte getPacketIdentifier(byte[] packetData){
 		// returns the byte identifying what the type of packet is
-		return header[PACKET_IDENTIFIER_INDEX];
+		assert(packetData.length == MTU);
+		return packetData[PACKET_IDENTIFIER_INDEX];
 	}
 	
 	public static byte[] getClientIdentifier(byte[] packetData){
@@ -142,10 +145,11 @@ public class Multicast {
 		return clientIdentifier;
 	}
 	
-	public static byte[] getHeaderData(byte[] header){
+	public static byte[] getHeaderData(byte[] packetData){
 		//returns the data from the header (ie. an ack or hello message)
+		assert(packetData.length == MTU);
 		byte[] headerData = new byte[HEADER_DATA];
-		System.arraycopy(header, HEADER_DATA_INDEX, headerData, 0, HEADER_DATA);
+		System.arraycopy(packetData, HEADER_DATA_INDEX, headerData, 0, HEADER_DATA);
 		return headerData;
 	}
 	
@@ -153,6 +157,7 @@ public class Multicast {
 		/*
 		 * Returns the data minus the header from the packet data.
 		 */
+		assert(packetData.length == MTU);
 		byte[] data = new byte[DATA];
 		System.arraycopy(packetData, DATA_INDEX, data, 0, DATA);
 		return data;

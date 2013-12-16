@@ -27,6 +27,15 @@ public class ClientNodeList {
 	}
 
 	/**
+	 * Returns ClientNode object mapped to the key passed.
+	 * @param key
+	 * @return
+	 */
+	public ClientNode getClientNode(int key){
+		return nodeList.get(key);
+	}
+	
+	/**
 	 * Returns boolean for whether a ClientNode is contained in the list of nodes.
 	 * @param node
 	 * @return
@@ -43,7 +52,7 @@ public class ClientNodeList {
 	public void add(ClientNode node){
 		if(!clientNodeLookup(node) && !myID.equals(node.getID())){
 			nodeList.put(node.getID().getIdentifier(), node);
-			terminal.println("RECEIVED");
+			terminal.println("Client added " + node.getID().toString());
 			terminal.println(node.toString());
 		}
 	}
