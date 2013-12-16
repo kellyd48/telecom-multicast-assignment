@@ -23,6 +23,8 @@ public class Client {
 	private Send s;
 	private Listener l;
 	private Terminal terminal;
+	private Ack ackReceived;
+	private Ack ackToSend;
 	
 	/**
 	 * Client Constructor
@@ -82,7 +84,7 @@ public class Client {
 		 * Send Constructor
 		 */
 		public Send(){
-			s = new Sender();
+			s = new Sender(ID);
 		} // end constructor
 		
 		@Override
@@ -93,10 +95,12 @@ public class Client {
 				sendHello();
 				break;
 			case LISTENING:
+				
 				break;
 			case SENDING_IMAGE:
 				runSender(s);
 			case RECEIVING_IMAGE:
+				
 				break;
 			default:
 				break;
@@ -154,7 +158,7 @@ public class Client {
 		 * Listener Constructor
 		 */
 		public Listener() {
-			r = new Receiver();
+			r = new Receiver(ID);
 		} // end constructor
 		
 		@Override
@@ -176,22 +180,24 @@ public class Client {
 		public synchronized void receivePacket() throws IOException{
 			DatagramPacket p = null;
 			byte[] data= new byte[Multicast.MTU];  
-			for(;;) {
-				p = new DatagramPacket(data, data.length);
-				mSocket.receive(p);
-				byte[] packetData = p.getData();
-				switch(Multicast.getPacketType(packetData)){
-				case HELLO:
-					Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
-					receiveHello(p.getAddress(), p.getPort(), identifier);
-					break;
-				case IMAGE:
-				case IMAGE_METADATA:
-					r.receivePacket(p.getData());
-					break;
-				default:
-					break;
-				}
+			p = new DatagramPacket(data, data.length);
+			mSocket.receive(p);
+			byte[] packetData = p.getData();
+			switch(Multicast.getPacketType(packetData)){
+			case HELLO:
+				Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
+				receiveHello(p.getAddress(), p.getPort(), identifier);
+				break;
+			case IMAGE:
+			case IMAGE_METADATA:
+				r.receivePacket(packetData);
+				r.run();
+				ackToSend = new Ack(r.getAckToSend());
+				break;
+			case ACK:
+				break;
+			default:
+				break;
 			}
 		}
 		
@@ -205,7 +211,6 @@ public class Client {
 			ClientNode node = new ClientNode(address, port, identifier);
 			clientNodeList.add(node);
 		}
-		
 	} // end Listener 
 
 } // end Client

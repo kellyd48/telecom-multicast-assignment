@@ -32,10 +32,11 @@ public class Multicast {
 	//A hello packet contains this byte array in the header
 	public static final byte[] HELLO = {'H', 'I', '!'};
 	// Constants for identifying the type of packet.
-	public static enum PACKET_TYPE {HELLO, IMAGE, IMAGE_METADATA, UNKNOWN};
+	public static enum PACKET_TYPE {HELLO, IMAGE, IMAGE_METADATA, ACK, UNKNOWN};
 	public static final byte HELLO_IDENTIFIER = 'H';
 	public static final byte IMAGE_IDENTIFIER = 'I';
 	public static final byte IMAGE_METADATA_IDENTIFIER = 'M';
+	public static final byte ACK_IDENTIFIER = 'A';
 	
 
 	public static PACKET_TYPE getPacketType(byte[] packetData){
@@ -66,6 +67,20 @@ public class Multicast {
 		return packet;
 	}
 
+	public static byte[] constructAckPacket(Identifier ID, Ack ack){
+		/*
+		 * Constructs an ack packet in reply to a data packet.
+		 */
+		byte[] packet = new byte[MTU];
+		//Insert Packet Identifier.
+		packet[PACKET_IDENTIFIER_INDEX] = ACK_IDENTIFIER;
+		//Insert ACK
+		System.arraycopy(ack.getAck(), 0, packet, HEADER_DATA_INDEX, ACK_LENGTH);
+		//Insert Client Identifier
+		System.arraycopy(ID.toBytes(), 0, packet, CLIENT_IDENTIFIER_INDEX, CLIENT_IDENTIFIER);
+		return packet;
+	}
+	
 	public static byte[] constructImagePacket(Identifier ID, byte[] ack, byte[] imageData){
 		/*
 		 * Constructs an image packet when given an ack and the image data.
@@ -141,14 +156,5 @@ public class Multicast {
 		byte[] data = new byte[DATA];
 		System.arraycopy(packetData, DATA_INDEX, data, 0, DATA);
 		return data;
-	}
-
-	public static byte[] nextAck(byte[] ack){
-		byte[] newAck = new byte[ack.length];
-		if(ack[0] == 0)
-			ack[0] = 1;
-		else
-			ack[0] = 0;
-		return newAck;
 	}
 }
