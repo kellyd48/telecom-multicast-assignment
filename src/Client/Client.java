@@ -51,8 +51,8 @@ public class Client {
 	public void run(){
 		try {
 			/* Start the threads for sending and receiving */
+			l.start();
 			s.start();
-			l.start();	
 		}
 		catch(Exception e) {
 			e.printStackTrace();
