@@ -50,6 +50,16 @@ public class Ack {
 	}
 	
 	/**
+	 * Returns previous ack.
+	 * 
+	 * @param ack
+	 * @return
+	 */
+	public Ack getPrevious(Ack ack){
+		return new Ack(Ack.nextAck(ack.getAck()));
+	}
+	
+	/**
 	 * Updates internally stored ack to the next Ack.
 	 */
 	public void next(){
@@ -62,7 +72,7 @@ public class Ack {
 	 * @param ack
 	 * @return
 	 */
-	public Ack nextExpectedAck(Ack ack){
+	public static Ack nextExpectedAck(Ack ack){
 		return new Ack(Ack.nextAck(ack.getAck()));
 	}
 	

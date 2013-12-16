@@ -2,8 +2,12 @@ package Client;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.SocketException;
+
 import Receiver.Receiver;
 import Sender.Sender;
 import tcdIO.*;
@@ -11,7 +15,7 @@ import tcdIO.*;
 public class Client {
 	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
 	public static final int MCAST_PORT = 9013; // hardcoded port number for the multicast group
-	public static final int HELLO_TIME_INTERVAL = 100;
+	public static final int HELLO_TIME_INTERVAL = 200;
 	public static final int NUMBER_OF_PACKETS_PER_HELLO = 2;
 	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE};
 	
@@ -23,15 +27,16 @@ public class Client {
 	private Send s;
 	private Listener l;
 	private Terminal terminal;
-	private Ack ackReceived;
-	private Ack ackToSend;
 	
+	
+	private String testingSenderFile = "";
 	/**
 	 * Client Constructor
 	 */
-	public Client() {
-		terminal = new Terminal();
+	public Client(String testingSenderFile) {
+		this.testingSenderFile = testingSenderFile;
 		ID = new Identifier();
+		terminal = new Terminal("Client ID: " + ID.toString());
 		state = CLIENT_STATE.JOIN_GROUP;
 		clientNodeList = new ClientNodeList(ID,terminal);
 		// create send and listener objects
@@ -53,8 +58,8 @@ public class Client {
 	public void run(){
 		try {
 			/* Start the threads for sending and receiving */
-			s.start();
-			l.start();	
+			l.start();
+			s.start();	
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -63,11 +68,11 @@ public class Client {
 	} // end run
 	
 	public static void main(String[] args){
-		Client client1 = new Client();
+		Client client1 = new Client("doge.jpeg");
 		client1.run();
-		Client client2 = new Client();
+		Client client2 = new Client("");
 		client2.run();
-		Client client3 = new Client();
+		Client client3 = new Client("");
 		client3.run();
 	}
 	
@@ -89,23 +94,24 @@ public class Client {
 		
 		@Override
 		public void run() {
-			terminal.println("Client ID: " + ID.toString());
-			switch(state){
-			case JOIN_GROUP:
-				sendHello();
-				break;
-			case LISTENING:
-				
-				break;
-			case SENDING_IMAGE:
+			while(true){
+				switch(state){
+				case JOIN_GROUP:
+					sendHello();
+					state = CLIENT_STATE.SENDING_IMAGE;
+					break;
+				case LISTENING:
+					break;
+				case SENDING_IMAGE:
+					runSender(s);
+				case RECEIVING_IMAGE:
+
+					break;
+				default:
+					break;
+				}
 				runSender(s);
-			case RECEIVING_IMAGE:
-				
-				break;
-			default:
-				break;
 			}
-			runSender(s);
 		} // end run
 		
 		/**
@@ -117,7 +123,7 @@ public class Client {
 				DatagramPacket packet = new DatagramPacket(helloPacket, helloPacket.length, address, MCAST_PORT);
 				for(int i = 0; i < NUMBER_OF_PACKETS_PER_HELLO; i++){
 					mSocket.send(packet);
-					terminal.println("Client ID: " + ID.toString() + " Sent Hello Packet.");
+					terminal.println("Sent Hello Packet.");
 					sleep(HELLO_TIME_INTERVAL);
 				}
 			}catch(IOException e){
@@ -133,7 +139,7 @@ public class Client {
 		 */
 		public synchronized void runSender(Sender s){
 			try {
-				s.run();
+				s.run(testingSenderFile);
 				if(s.hasPacketToSend()){
 					byte[] packetData = s.packetToSend();
 					packet = new DatagramPacket(packetData, packetData.length, address, MCAST_PORT);
@@ -180,24 +186,28 @@ public class Client {
 		public synchronized void receivePacket() throws IOException{
 			DatagramPacket p = null;
 			byte[] data= new byte[Multicast.MTU];  
-			p = new DatagramPacket(data, data.length);
-			mSocket.receive(p);
-			byte[] packetData = p.getData();
-			switch(Multicast.getPacketType(packetData)){
-			case HELLO:
+			while(true){
+				p = new DatagramPacket(data, data.length);
+				mSocket.receive(p);
+				byte[] packetData = p.getData();
 				Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
-				receiveHello(p.getAddress(), p.getPort(), identifier);
-				break;
-			case IMAGE:
-			case IMAGE_METADATA:
-				r.receivePacket(packetData);
-				r.run();
-				ackToSend = new Ack(r.getAckToSend());
-				break;
-			case ACK:
-				break;
-			default:
-				break;
+				switch(Multicast.getPacketType(packetData)){
+				case HELLO:
+					receiveHello(p.getAddress(), p.getPort(), identifier);
+					terminal.println("Received Hello Packet from " +identifier.toString() + " " +p.getAddress());
+					break;
+				case IMAGE:
+				case IMAGE_METADATA:
+					r.receivePacket(packetData);
+					r.run();
+					sendAckResponse(identifier, Ack.nextExpectedAck(r.getAck()));
+					break;
+				case ACK:
+
+					break;
+				default:
+					break;
+				}
 			}
 		}
 		
@@ -210,6 +220,21 @@ public class Client {
 		public synchronized void receiveHello(InetAddress address, int port, Identifier identifier){
 			ClientNode node = new ClientNode(address, port, identifier);
 			clientNodeList.add(node);
+		}
+		
+		public synchronized void sendAckResponse(Identifier ID, Ack ackToSend){
+			ClientNode node = clientNodeList.getClientNode(ID.getIdentifier());
+			byte[] data = Multicast.constructAckPacket(ID, ackToSend);
+			try {
+				DatagramSocket dSocket = new DatagramSocket(MCAST_PORT);
+				DatagramPacket packet = new DatagramPacket(data, Multicast.MTU, node.getAddress(), node.getPort());
+				dSocket.send(packet);
+				terminal.println("Sent ack ("+ackToSend.getAck()[0]+") to address: "+
+								node.getAddress().toString()+" port: "+node.getPort());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	} // end Listener 
 
