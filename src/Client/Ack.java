@@ -55,8 +55,8 @@ public class Ack {
 	 * @param ack
 	 * @return
 	 */
-	public Ack getPrevious(Ack ack){
-		return new Ack(Ack.nextAck(ack.getAck()));
+	public static Ack getPrevious(Ack ack){
+		return nextExpectedAck(ack);
 	}
 	
 	/**

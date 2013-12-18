@@ -10,6 +10,7 @@ public class ClientNode {
 	private InetAddress address;
 	private int port;
 	private Identifier id;
+	private Ack ack;
 
 	/**
 	 * Constructor for Client.
@@ -22,6 +23,15 @@ public class ClientNode {
 		this.address = address;
 		this.port = port;
 		this.id = new Identifier(id);
+		ack = null;
+	}
+	
+	public void setAck(Ack ack){
+		this.ack = new Ack(ack);
+	}
+	
+	public Ack getAck(){
+		return ack;
 	}
 	
 	/**
@@ -43,6 +53,10 @@ public class ClientNode {
 	 */
 	public Identifier getID(){
 		return id;
+	}
+	
+	public void resetAck(){
+		ack = null;
 	}
 
 	public String toString(){

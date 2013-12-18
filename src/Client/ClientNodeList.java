@@ -25,6 +25,13 @@ public class ClientNodeList {
 		nodeList = new HashMap<Integer, ClientNode>();
 		myID = new Identifier(ID);
 	}
+	
+	public ClientNodeList(ClientNodeList otherList){
+		this.terminal = otherList.getTerminal();
+		this.myID = getMyID();
+		nodeList = new HashMap<Integer, ClientNode>();
+		nodeList.putAll(otherList.getMap());
+	}
 
 	/**
 	 * Returns ClientNode object mapped to the key passed.
@@ -66,7 +73,7 @@ public class ClientNodeList {
 		if(clientNodeLookup(node))
 			nodeList.remove(node.getID().getIdentifier());
 	}
-
+	
 	/**
 	 * Returns the node at a certain index
 	 * @param index
@@ -95,6 +102,57 @@ public class ClientNodeList {
 		return nodeList.size();
 	}
 
+	/**
+	 * Returns the Identifier myID
+	 * 
+	 * @return
+	 */
+	public Identifier getMyID(){
+		return myID;
+	}
+
+	/**
+	 * Returns the HashMap nodeList
+	 * @return
+	 */
+	public HashMap<Integer, ClientNode> getMap(){
+		return nodeList;
+	}
+
+	/**
+	 * Returns reference to terminal.
+	 * @return
+	 */
+	public Terminal getTerminal(){
+		return terminal;
+	}
+
+	public void updateAck(Identifier ID, Ack ack){
+		ClientNode node = nodeList.get(ID.getIdentifier());
+		node.setAck(ack);
+	}
+	
+	/**
+	 * Checks for ack with the value provided.
+	 * Returns true if a client has an ack with the same value
+	 * 
+	 * @param ack
+	 * @return
+	 */
+	public boolean checkForAck(Ack ack){
+		@SuppressWarnings("rawtypes")
+		Set nodes = nodeList.entrySet();
+		@SuppressWarnings("rawtypes")
+		Iterator iterator = nodes.iterator();
+		while(iterator.hasNext()){
+			@SuppressWarnings("unchecked")
+			Map.Entry<Integer, ClientNode> node = (Map.Entry<Integer, ClientNode>)iterator.next();
+			if(node.getValue().getAck() != null && Ack.equals(node.getValue().getAck(), ack))
+				return true;
+		}
+		return false;
+	}
+	
 	public String toString(){
 		String toString = "";
 		@SuppressWarnings("rawtypes")

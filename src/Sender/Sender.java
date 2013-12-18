@@ -31,6 +31,7 @@ public class Sender {
 			if(!inputFileTest.equals("")){
 				state = SENDER_STATE.SEND_METADATA;
 				getImageFromFile(inputFileTest);
+				inputFileTest = "";
 			}
 			break;
 		case SEND_METADATA:

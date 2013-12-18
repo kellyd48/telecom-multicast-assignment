@@ -43,16 +43,25 @@ public class Multicast {
 		/*
 		 * Returns the type of packet based on the packet data
 		 */
-		switch(getPacketIdentifier(getHeaderData(packetData))){
+		PACKET_TYPE packetType;
+		switch(getPacketIdentifier(packetData)){
 		case HELLO_IDENTIFIER:
-			return PACKET_TYPE.HELLO;
+			packetType =  PACKET_TYPE.HELLO;
+			break;
 		case IMAGE_IDENTIFIER:
-			return PACKET_TYPE.IMAGE;
+			packetType =  PACKET_TYPE.IMAGE;
+			break;
 		case IMAGE_METADATA_IDENTIFIER:
-			return PACKET_TYPE.IMAGE_METADATA;
+			packetType =  PACKET_TYPE.IMAGE_METADATA;
+			break;
+		case ACK_IDENTIFIER:
+			packetType =  PACKET_TYPE.ACK;
+			break;
 		default:
-			return PACKET_TYPE.UNKNOWN;
+			packetType =  PACKET_TYPE.UNKNOWN;
+			break;
 		}
+		return packetType;
 	}
 
 	public static byte[] constructHelloPacket(Identifier ID){
@@ -113,14 +122,14 @@ public class Multicast {
 		System.arraycopy(ID.toBytes(), 0, packet, CLIENT_IDENTIFIER_INDEX, CLIENT_IDENTIFIER);
 		//Insert metadata
 		byte[] metadata = (Integer.toString(imageSize)).getBytes();
-		System.arraycopy(metadata, 0, packet, HEADER, metadata.length);
+		System.arraycopy(metadata, 0, packet, DATA_INDEX, metadata.length);
 		return packet;
  	}
 	
 	public static int getImageSizeMetadataPacket(byte[] packetData){
 		// returns the size of an image in bytes from the metadata given.
 		assert(packetData.length == MTU);
-		byte[] metadata = getHeaderData(packetData);
+		byte[] metadata = getData(packetData);
 		return Integer.valueOf(new String(metadata, 0, metadata.length).trim()).intValue();
 	}
 
@@ -139,10 +148,10 @@ public class Multicast {
 		return packetData[PACKET_IDENTIFIER_INDEX];
 	}
 	
-	public static byte[] getClientIdentifier(byte[] packetData){
+	public static Identifier getClientIdentifier(byte[] packetData){
 		byte[] clientIdentifier = new byte[CLIENT_IDENTIFIER];
 		System.arraycopy(packetData, CLIENT_IDENTIFIER_INDEX, clientIdentifier, 0, CLIENT_IDENTIFIER);
-		return clientIdentifier;
+		return new Identifier(clientIdentifier);
 	}
 	
 	public static byte[] getHeaderData(byte[] packetData){

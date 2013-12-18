@@ -60,7 +60,7 @@ public class Receiver {
 	 */
 	public void receivePacket(byte[] packetData){
 		assert(packetData != null);
-		packetReceived = new byte[Multicast.DATA];
+		packetReceived = new byte[Multicast.MTU];
 		System.arraycopy(packetData, 0, packetReceived, 0, packetReceived.length);
 	}
 }
