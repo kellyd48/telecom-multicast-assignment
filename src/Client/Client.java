@@ -15,11 +15,13 @@ import tcdIO.*;
 public class Client {
 	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
 	public static final int MCAST_PORT = 9013; // hardcoded port number for the multicast group
+	public static final int DATAGRAM_PORT = 9014;
 	public static final int HELLO_TIME_INTERVAL = 200;
 	public static final int NUMBER_OF_PACKETS_PER_HELLO = 2;
 	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE};
 
 	private MulticastSocket mSocket;
+	DatagramSocket dSocket;
 	private InetAddress address;
 	private CLIENT_STATE state;
 	private ClientNodeList clientNodeList;
@@ -33,10 +35,14 @@ public class Client {
 	//variable just for testing sending an image.
 	private String testingSenderFile = "";
 
+	public Client(String testingSenderFile){
+		this(testingSenderFile, DATAGRAM_PORT);
+	}
+
 	/**
 	 * Client Constructor
 	 */
-	public Client(String testingSenderFile) {
+	public Client(String testingSenderFile, int port) {
 		this.testingSenderFile = testingSenderFile;
 		ID = new Identifier();
 		terminal = new Terminal("Client ID: " + ID.toString());
@@ -46,6 +52,7 @@ public class Client {
 		s = new Send();
 		l = new Listener();
 		try {
+			dSocket = new DatagramSocket(port);
 			address = InetAddress.getByName(MCAST_ADDR);
 			mSocket = new MulticastSocket(MCAST_PORT);
 			mSocket.joinGroup(address);
@@ -71,11 +78,11 @@ public class Client {
 	} // end run
 
 	public static void main(String[] args){
-		Client client1 = new Client("");
+		Client client1 = new Client("", 9014);
 		client1.run();
-		Client client2 = new Client("");
+		Client client2 = new Client("", 9015);
 		client2.run();
-		Client client3 = new Client("doge.jpeg");
+		Client client3 = new Client("doge.jpeg", 9016);
 		client3.run();
 	}
 
@@ -226,7 +233,7 @@ public class Client {
 						}
 						break;
 					case ACK:
-						if(state == CLIENT_STATE.RECEIVING_IMAGE){
+						if(state == CLIENT_STATE.SENDING_IMAGE){
 							senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), new Ack(Multicast.getHeaderData(packetData)));
 						}	
 						break;
@@ -252,7 +259,6 @@ public class Client {
 			ClientNode node = clientNodeList.getClientNode(ID.getIdentifier());
 			byte[] data = Multicast.constructAckPacket(ID, ackToSend);
 			try {
-				DatagramSocket dSocket = new DatagramSocket(MCAST_PORT);
 				DatagramPacket packet = new DatagramPacket(data, Multicast.MTU, node.getAddress(), node.getPort());
 				dSocket.send(packet);
 				terminal.println("Sent ack ("+ackToSend.getAck()[0]+") to address: "+
