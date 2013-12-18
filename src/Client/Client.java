@@ -15,7 +15,6 @@ import tcdIO.*;
 public class Client {
 	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
 	public static final int MCAST_PORT = 9013; // hardcoded port number for the multicast group
-	public static final int DATAGRAM_PORT = 9014;
 	public static final int HELLO_TIME_INTERVAL = 200;
 	public static final int NUMBER_OF_PACKETS_PER_HELLO = 2;
 	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE};
@@ -35,14 +34,10 @@ public class Client {
 	//variable just for testing sending an image.
 	private String testingSenderFile = "";
 
-	public Client(String testingSenderFile){
-		this(testingSenderFile, DATAGRAM_PORT);
-	}
-
 	/**
 	 * Client Constructor
 	 */
-	public Client(String testingSenderFile, int port) {
+	public Client(String testingSenderFile) {
 		this.testingSenderFile = testingSenderFile;
 		ID = new Identifier();
 		terminal = new Terminal("Client ID: " + ID.toString());
@@ -52,7 +47,7 @@ public class Client {
 		s = new Send();
 		l = new Listener();
 		try {
-			dSocket = new DatagramSocket(port);
+			dSocket = new DatagramSocket(MCAST_PORT);
 			address = InetAddress.getByName(MCAST_ADDR);
 			mSocket = new MulticastSocket(MCAST_PORT);
 			mSocket.joinGroup(address);
@@ -78,11 +73,11 @@ public class Client {
 	} // end run
 
 	public static void main(String[] args){
-		Client client1 = new Client("", 9014);
+		Client client1 = new Client("");
 		client1.run();
-		Client client2 = new Client("", 9015);
+		Client client2 = new Client("");
 		client2.run();
-		Client client3 = new Client("doge.jpeg", 9016);
+		Client client3 = new Client("doge.jpeg");
 		client3.run();
 	}
 
