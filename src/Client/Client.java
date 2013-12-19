@@ -249,6 +249,9 @@ public class Client {
 					}
 				} // end switch
 			} // end if
+			else {
+				// ignore packets received by this node sent to itself over multicast
+			}
 		} // end receivePacket
 		
 		/**
