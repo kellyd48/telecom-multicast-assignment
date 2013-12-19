@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
-import java.net.SocketException;
 
 import Receiver.Receiver;
 import Sender.Sender;
@@ -18,15 +16,13 @@ public class Client {
 	public static final int DATAGRAM_PORT = 9014;
 	public static final int HELLO_TIME_INTERVAL = 200;
 	public static final int NUMBER_OF_PACKETS_PER_HELLO = 2;
-	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE};
+	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE, CLOSED};
 
 	private MulticastSocket mSocket;
 	DatagramSocket dSocket;
 	private InetAddress address;
 	private CLIENT_STATE state;
 	private ClientNodeList clientNodeList;
-	// Keeps track of nodes sending image to
-	private ClientNodeList senderNodeList;
 	private Identifier ID;
 	private Send s;
 	private Listener l;
@@ -104,34 +100,42 @@ public class Client {
 
 		@Override
 		public void run() {
-			while(true){/*
+			while(state != CLIENT_STATE.CLOSED){
 				switch(state){
 				case JOIN_GROUP:
+					printState();
 					sendHello();
 					state = CLIENT_STATE.LISTENING;
 					break;
 				case LISTENING:
+					printState();
 					if(!testingSenderFile.equals("")){
-						//updateSenderNodeList();
-						runSender(s);
+						//runSender(s);
 						state = CLIENT_STATE.SENDING_IMAGE;
+						testingSenderFile = "";
 					}
 					break;
 				case SENDING_IMAGE:
-					if(senderNodeList != null){
-						if(s.getSequence() != null && senderNodeList.checkForAck(Ack.getPrevious(s.getSequence())))
-							s.resend();
-					}
-					runSender(s);
+					printState();
+					//						if(senderNodeList.checkForAck(Ack.getPrevious(s.getSequence())))
+					//							s.resend();
+					//runSender(s);
 					break;
 				case RECEIVING_IMAGE:
+					printState();
 					break;
 				default:
+					printState();
 					break;
-				}*/
-				terminal.println("Sender state: "+state.toString());
+				}
 			}
 		} // end run
+		
+		public synchronized void printState(){
+			synchronized(terminal){
+				terminal.println("Sender state: "+state.toString());
+			}
+		}
 
 		/**
 		 * Send hello packets
@@ -161,8 +165,6 @@ public class Client {
 				s.run(testingSenderFile);
 				if(s.hasPacketToSend()){
 					byte[] packetData = s.packetToSend();
-					if(Multicast.getPacketType(packetData) == Multicast.PACKET_TYPE.IMAGE_METADATA)
-						updateSenderNodeList();
 					packet = new DatagramPacket(packetData, packetData.length, address, MCAST_PORT);
 					mSocket.send(packet);
 					terminal.println("Sent packet from Sender.");
@@ -173,10 +175,6 @@ public class Client {
 				e.printStackTrace();
 			}
 		} // end runSender
-
-		public synchronized void updateSenderNodeList(){
-			senderNodeList = new ClientNodeList(clientNodeList);
-		}
 	} // end Send
 
 	/**
@@ -251,10 +249,10 @@ public class Client {
 					break;
 				} // end IMAGE
 				case ACK: {
-					if(state == CLIENT_STATE.SENDING_IMAGE){
-						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
-								new Ack(Multicast.getHeaderData(packetData)));
-					}	
+					//					if(state == CLIENT_STATE.SENDING_IMAGE){
+					//						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
+					//								new Ack(Multicast.getHeaderData(packetData)));
+					//					}	
 					break;
 				} // end ACK
 				default: {
@@ -274,7 +272,6 @@ public class Client {
 		 */
 		public synchronized void sendAckResponse(Identifier ID, Ack ackToSend) {
 			assert(ID != null && ackToSend != null);
-
 			ClientNode node = clientNodeList.getClientNode(ID.getIdentifier());
 			byte[] data = Multicast.constructAckPacket(ID, ackToSend);
 			try {
