@@ -201,7 +201,7 @@ public class Client {
 				} // end while
 			}
 			catch(IOException e) {
-				System.out.println("Socket closed prematurely");
+				System.err.println("Socket closed prematurely");
 			}
 		} // end run
 
