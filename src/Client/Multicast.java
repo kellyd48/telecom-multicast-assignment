@@ -5,6 +5,15 @@ package Client;
  *
  */
 public class Multicast {
+	
+	/*
+	 * Default addresses and ports
+	 */
+	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
+	public static final int MCAST_PORT = 9013; // hardcoded port number for the multicast group
+	public static final int HELLO_TIME_INTERVAL = 200;
+	public static final int NUMBER_OF_PACKETS_PER_HELLO = 2;
+	
 	/*
 	 * Data In Packet looks like this
 	 * | HEADER |      DATA     |
