@@ -5,42 +5,22 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-import tcdIO.Terminal;
-import Client.Client.CLIENT_STATE;
-import Receiver.Receiver;
+import Receiver.*;
+import tcdIO.*;
 
-/**
- * Listener thread
- * Receives Packets from the nodes and forwards them to the receiver class
- *
- */
-public class Listener extends Thread {
+public class Listening extends Transmission implements Runnable {
+
 	private Receiver r;
-	private Identifier ID;
-	private CLIENT_STATE state;
-	private MulticastSocket mSocket;
-	private InetAddress mAddress;
-	private Terminal terminal;
-	private ClientNodeList clientNodeList;
-	private ClientNodeList senderNodeList;
-
-	/**
-	 * Listener Constructor
-	 */
-	public Listener(Identifier ID, Client.CLIENT_STATE state, MulticastSocket mSocket, InetAddress mAddress,
-			Terminal terminal, ClientNodeList clientNodeList, ClientNodeList senderNodeList) {
-		this.ID = ID;
-		this.mSocket = mSocket;
-		this.mAddress = mAddress;
+	protected Terminal terminal;
+	
+	public Listening(MulticastSocket mSocket, InetAddress mAddress,
+			CLIENT_STATE state, ClientNodeList clientNodeList,
+			ClientNodeList senderNodeList, Identifier ID, Terminal terminal) {
+		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, terminal);
 		this.terminal = terminal;
-		this.clientNodeList = clientNodeList;
-		this.senderNodeList = senderNodeList;
-		r = new Receiver(ID);
-	} // end constructor
+		this.r = new Receiver(ID);
+	}
 
-	/**
-	 * Listens for packets on the mSocket
-	 */
 	@Override
 	public void run() {
 		try {
@@ -52,20 +32,13 @@ public class Listener extends Thread {
 				mSocket.receive(p);	
 				// process it
 				receivePacket(p);
-				//sleep for a bit to see whats happening
-				try {
-					sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			} // end while
 		}
 		catch(IOException e) {
 			System.err.println("Socket closed prematurely");
 		}
-	} // end run
-
+	}
+	
 	/**
 	 * Processes a packet
 	 * @param p
@@ -102,7 +75,6 @@ public class Listener extends Thread {
 				} // end IMAGE
 				case ACK: {
 					if(state == CLIENT_STATE.SENDING_IMAGE){
-						println("Received Ack");
 						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
 								new Ack(Multicast.getHeaderData(packetData)));
 					}	
@@ -125,6 +97,7 @@ public class Listener extends Thread {
 	 */
 	public synchronized void sendAckResponse(Identifier ID, Ack ackToSend) {
 		assert(ID != null && ackToSend != null);
+		
 		byte[] data = Multicast.constructAckPacket(ID, ackToSend);
 		try {
 			DatagramPacket packet = new DatagramPacket(data, Multicast.MTU, mAddress, Multicast.MCAST_PORT);
@@ -135,18 +108,5 @@ public class Listener extends Thread {
 			e.printStackTrace();
 		}
 	} // end sendAckResponse
-
-	/**
-	 * Special print method needed for printing with the Terminal in while loops/threaded apps.
-	 * 
-	 * @param message
-	 */
-	private synchronized void println(String message){
-		try {
-			sleep(20);
-			terminal.println(message);
-		} catch (InterruptedException e) {
-			System.err.println("terminal problem");
-		}
-	}
-} // end Listener 
+	
+}

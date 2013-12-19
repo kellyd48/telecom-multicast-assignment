@@ -1,18 +1,12 @@
 package Client;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-import Receiver.Receiver;
-import Sender.Sender;
+import Client.Transmission.*;
 import tcdIO.*;
 
-public class Client extends Thread {
-	
-	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE, CLOSED};
+public class Client implements Runnable{
 
 	private MulticastSocket mSocket;
 	private InetAddress mAddress;
@@ -20,52 +14,42 @@ public class Client extends Thread {
 	private ClientNodeList clientNodeList;
 	private ClientNodeList senderNodeList;
 	private Identifier ID;
-	private Send s;
-	private Listener l;
 	private Terminal terminal;
-
-	/**
-	 * Client Constructor
-	 */
-	public Client(String testingSenderFile, int port) {
+	private String testingSenderFile;
+	
+	public static void main(String[] args) {
+		new Thread(new Client()).start();
+		new Thread(new Client()).start();
+		new Thread(new Client("doge.jpeg")).start();
+	}
+	
+	public Client() {
+		this("");
+	}
+	
+	public Client(String testingSenderFile) {
 		ID = new Identifier();
-		terminal = new Terminal("Client ID: " + ID.toString());
+		this.testingSenderFile = testingSenderFile;
 		state = CLIENT_STATE.JOIN_GROUP;
+		terminal = new Terminal("Client ID: " + ID.toString());
 		clientNodeList = new ClientNodeList(ID,terminal);
 		try {
 			mAddress = InetAddress.getByName(Multicast.MCAST_ADDR);
 			mSocket = new MulticastSocket(Multicast.MCAST_PORT);
 			mSocket.joinGroup(mAddress);
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
 		}
-		// create send and listener objects
-		s = new Send(ID, state, mSocket, mAddress, terminal, clientNodeList, senderNodeList, testingSenderFile);
-		l = new Listener(ID, state, mSocket, mAddress, terminal, clientNodeList, senderNodeList);
-	} // end constructor
-
-	/**
-	 * Run method, starts the sending and receiving threads
-	 */
-	@Override
-	public void run(){
-		try {
-			/* Start the threads for sending and receiving */
-			l.start();
-			s.start();
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-	} // end run
-
-	public static void main(String[] args){
-		Client client1 = new Client("", 9014);
-		client1.start();
-		Client client2 = new Client("", 9015);
-		client2.start();
-		Client client3 = new Client("doge.jpeg", 9016);
-		client3.start();
 	}
-} // end Client
+
+	@Override
+	public void run() {
+		// create and start send and listener threads
+		new Thread(new Sending(mSocket,mAddress, state, clientNodeList, 
+				clientNodeList, ID, terminal, testingSenderFile)).start();
+		new Thread(new Listening(mSocket, mAddress, state, clientNodeList, 
+				clientNodeList, ID, terminal)).start();	
+	}
+
+}
