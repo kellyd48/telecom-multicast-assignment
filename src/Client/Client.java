@@ -106,34 +106,35 @@ public class Client {
 					printState();
 					sendHello();
 					state = CLIENT_STATE.LISTENING;
+					printState();
 					break;
 				case LISTENING:
-					printState();
 					if(!testingSenderFile.equals("")){
 						//runSender(s);
 						state = CLIENT_STATE.SENDING_IMAGE;
+						printState();
 						testingSenderFile = "";
 					}
 					break;
 				case SENDING_IMAGE:
-					printState();
-					//						if(senderNodeList.checkForAck(Ack.getPrevious(s.getSequence())))
-					//							s.resend();
-					//runSender(s);
+//					if(senderNodeList.checkForAck(Ack.getPrevious(s.getSequence())))
+//						s.resend();
+					runSender(s);
 					break;
 				case RECEIVING_IMAGE:
-					printState();
 					break;
 				default:
-					printState();
 					break;
 				}
 			}
 		} // end run
 		
 		public synchronized void printState(){
-			synchronized(terminal){
+			try {
+				sleep(20);
 				terminal.println("Sender state: "+state.toString());
+			} catch (InterruptedException e) {
+				System.err.println("terminal problem");
 			}
 		}
 
@@ -265,6 +266,15 @@ public class Client {
 			}
 		} // end receivePacket
 
+		public synchronized void printState(){
+			try {
+				sleep(20);
+				terminal.println("Sender state: "+state.toString());
+			} catch (InterruptedException e) {
+				System.err.println("terminal problem");
+			}
+		}
+		
 		/**
 		 * Sends an ACK over a datagram socket
 		 * @param ID
