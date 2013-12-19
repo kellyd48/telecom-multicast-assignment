@@ -69,14 +69,23 @@ public class Send extends Thread {
 					//sends next image packet
 					if(senderNodeList.checkForAck(Ack.getPrevious(s.getSequence())) || senderNodeList.checkForAck(null)){
 						s.resend();
+						println("Resending");
 					}
 					runSender(s);
+					println("Sending");
 					break;
 				case RECEIVING_IMAGE:
 					//does nothing
 					break;
 				default:
 					break;
+			}
+			//sleep for a bit to see whats happening
+			try {
+				sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	} // end run
@@ -133,6 +142,7 @@ public class Send extends Thread {
 	 * @param message
 	 */
 	private synchronized void println(String message){
+		assert(message != null):"Null String passed to terminal";
 		try {
 			sleep(20);
 			terminal.println(message);

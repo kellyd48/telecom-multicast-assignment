@@ -52,6 +52,13 @@ public class Listener extends Thread {
 				mSocket.receive(p);	
 				// process it
 				receivePacket(p);
+				//sleep for a bit to see whats happening
+				try {
+					sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} // end while
 		}
 		catch(IOException e) {
@@ -95,6 +102,7 @@ public class Listener extends Thread {
 				} // end IMAGE
 				case ACK: {
 					if(state == CLIENT_STATE.SENDING_IMAGE){
+						println("Received Ack");
 						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
 								new Ack(Multicast.getHeaderData(packetData)));
 					}	
