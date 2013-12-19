@@ -211,6 +211,8 @@ public class Client {
 		 * @throws IOException
 		 */
 		public synchronized void receivePacket(DatagramPacket p) throws IOException {
+			assert(p != null);
+			
 			byte[] packetData = p.getData();
 			Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
 			if(!identifier.equals(ID)) {
@@ -260,6 +262,8 @@ public class Client {
 		 * @param ackToSend
 		 */
 		public synchronized void sendAckResponse(Identifier ID, Ack ackToSend) {
+			assert(ID != null && ackToSend != null);
+			
 			ClientNode node = clientNodeList.getClientNode(ID.getIdentifier());
 			byte[] data = Multicast.constructAckPacket(ID, ackToSend);
 			try {
