@@ -127,6 +127,11 @@ public class ClientNodeList {
 		return terminal;
 	}
 
+	/**
+	 * Updates the ack stored in the ClientNode mapped to ID.
+	 * @param ID
+	 * @param ack
+	 */
 	public void updateAck(Identifier ID, Ack ack){
 		ClientNode node = nodeList.get(ID.getIdentifier());
 		node.setAck(ack);

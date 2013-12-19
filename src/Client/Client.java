@@ -40,8 +40,8 @@ public class Client extends Thread {
 			e.printStackTrace();
 		}
 		// create send and listener objects
-		s = new Send(ID, state, mSocket, mAddress, terminal, testingSenderFile);
-		l = new Listener(ID, state, mSocket, mAddress, terminal, clientNodeList);
+		s = new Send(ID, state, mSocket, mAddress, terminal, clientNodeList, senderNodeList, testingSenderFile);
+		l = new Listener(ID, state, mSocket, mAddress, terminal, clientNodeList, senderNodeList);
 	} // end constructor
 
 	/**

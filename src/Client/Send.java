@@ -22,18 +22,24 @@ public class Send extends Thread {
 	private Identifier ID;
 	private Client.CLIENT_STATE state;
 	private InetAddress mAddress;
+	private ClientNodeList clientNodeList;
+	private ClientNodeList senderNodeList;
 	private String testingSenderFile = "";
 
 	/**
 	 * Send Constructor
 	 */
-	public Send(Identifier ID, Client.CLIENT_STATE state, MulticastSocket mSocket, InetAddress mAddress, Terminal terminal, String testingSenderFile){
+	public Send(Identifier ID, Client.CLIENT_STATE state, MulticastSocket mSocket, InetAddress mAddress, 
+							Terminal terminal, ClientNodeList clientNodeList, ClientNodeList senderNodeList,
+										String testingSenderFile){
 		this.terminal = terminal;
 		this.mSocket = mSocket;
 		this.ID = ID;
 		this.state = state;
 		this.testingSenderFile = testingSenderFile;
 		this.mAddress = mAddress;
+		this.clientNodeList = clientNodeList;
+		this.senderNodeList = senderNodeList;
 		s = new Sender(ID);
 	} // end constructor
 
@@ -42,25 +48,32 @@ public class Send extends Thread {
 		while(state != Client.CLIENT_STATE.CLOSED){
 			switch(state){
 				case JOIN_GROUP:
+					//sends hello packets
 					println("Sender state: "+state.toString());
 					sendHello();
 					state = Client.CLIENT_STATE.LISTENING;
 					println("Sender state: "+state.toString());
 					break;
 				case LISTENING:
+					//waiting for image to send
+					//send hello packet at certain intervals
 					if(!testingSenderFile.equals("")){ // if image path is empty
-						//runSender(s);
+						updateSenderNodeList();
+						runSender(s);
 						state = Client.CLIENT_STATE.SENDING_IMAGE;
 						println("Sender state: "+state.toString());
 						testingSenderFile = "";
 					}
 					break;
 				case SENDING_IMAGE:
-					//					if(senderNodeList.checkForAck(Ack.getPrevious(s.getSequence())))
-					//						s.resend();
+					//sends next image packet
+					if(senderNodeList.checkForAck(Ack.getPrevious(s.getSequence())) || senderNodeList.checkForAck(null)){
+						s.resend();
+					}
 					runSender(s);
 					break;
 				case RECEIVING_IMAGE:
+					//does nothing
 					break;
 				default:
 					break;
@@ -107,6 +120,18 @@ public class Send extends Thread {
 		}
 	} // end runSender
 
+	/**
+	 *	Updates the senderNodeList to contain the current state of the clientNodeList. 
+	 */
+	public synchronized void updateSenderNodeList(){
+		senderNodeList = new ClientNodeList(clientNodeList);
+	}
+	
+	/**
+	 * Special print method needed for printing with the Terminal in while loops/threaded apps.
+	 * 
+	 * @param message
+	 */
 	private synchronized void println(String message){
 		try {
 			sleep(20);

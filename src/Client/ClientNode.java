@@ -8,7 +8,6 @@ import java.net.InetAddress;
  */
 public class ClientNode {
 	private InetAddress address;
-	private int port;
 	private Identifier id;
 	private Ack ack;
 
@@ -19,9 +18,8 @@ public class ClientNode {
 	 * @param port
 	 * @param id
 	 */
-	public ClientNode(InetAddress address, int port, Identifier id){
+	public ClientNode(InetAddress address, Identifier id){
 		this.address = address;
-		this.port = port;
 		this.id = new Identifier(id);
 		ack = null;
 	}
@@ -40,13 +38,6 @@ public class ClientNode {
 	public InetAddress getAddress() {
 		return address;
 	}
-
-	/**
-	 * @return Integer port of Client
-	 */
-	public int getPort() {
-		return port;
-	}
 	
 	/**
 	 * @return Identifier of client.
@@ -60,6 +51,6 @@ public class ClientNode {
 	}
 
 	public String toString(){
-		return "Client Node ID: " + id.toString() + " Address: " + address.getHostAddress() + " Port: " + port;
+		return "Client Node ID: " + id.toString() + " Address: " + address.getHostAddress();
 	}
 }

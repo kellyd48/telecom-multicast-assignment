@@ -22,17 +22,19 @@ public class Listener extends Thread {
 	private InetAddress mAddress;
 	private Terminal terminal;
 	private ClientNodeList clientNodeList;
+	private ClientNodeList senderNodeList;
 
 	/**
 	 * Listener Constructor
 	 */
 	public Listener(Identifier ID, Client.CLIENT_STATE state, MulticastSocket mSocket, InetAddress mAddress,
-								Terminal terminal, ClientNodeList clientNodeList) {
+			Terminal terminal, ClientNodeList clientNodeList, ClientNodeList senderNodeList) {
 		this.ID = ID;
 		this.mSocket = mSocket;
 		this.mAddress = mAddress;
 		this.terminal = terminal;
 		this.clientNodeList = clientNodeList;
+		this.senderNodeList = senderNodeList;
 		r = new Receiver(ID);
 	} // end constructor
 
@@ -64,14 +66,13 @@ public class Listener extends Thread {
 	 */
 	public synchronized void receivePacket(DatagramPacket p) throws IOException {
 		assert(p != null);
-
 		byte[] packetData = p.getData();
 		Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
 		//checks if the packet received originated from the local client
 		if(!identifier.equals(ID)) {
 			switch(Multicast.getPacketType(packetData)) {
 				case HELLO: {
-					ClientNode node = new ClientNode(mAddress, p.getPort(), identifier);
+					ClientNode node = new ClientNode(mAddress, identifier);
 					clientNodeList.add(node);
 					println("Received Hello Packet from " +identifier.toString() + " " +p.getAddress());
 					break;
@@ -93,10 +94,10 @@ public class Listener extends Thread {
 					break;
 				} // end IMAGE
 				case ACK: {
-					//					if(state == CLIENT_STATE.SENDING_IMAGE){
-					//						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
-					//								new Ack(Multicast.getHeaderData(packetData)));
-					//					}	
+					if(state == CLIENT_STATE.SENDING_IMAGE){
+						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
+								new Ack(Multicast.getHeaderData(packetData)));
+					}	
 					break;
 				} // end ACK
 				default: {
@@ -110,25 +111,28 @@ public class Listener extends Thread {
 	} // end receivePacket
 
 	/**
-	 * Sends an ACK over a datagram socket
+	 * Sends an ACK over the multicast socket.
 	 * @param ID
 	 * @param ackToSend
 	 */
 	public synchronized void sendAckResponse(Identifier ID, Ack ackToSend) {
 		assert(ID != null && ackToSend != null);
-		ClientNode node = clientNodeList.getClientNode(ID.getIdentifier());
 		byte[] data = Multicast.constructAckPacket(ID, ackToSend);
 		try {
-			DatagramPacket packet = new DatagramPacket(data, Multicast.MTU, node.getAddress(), node.getPort());
+			DatagramPacket packet = new DatagramPacket(data, Multicast.MTU, mAddress, Multicast.MCAST_PORT);
 			mSocket.send(packet);
-			println("Sent ack ("+ackToSend.getAck()[0]+") to address: "+
-					node.getAddress().toString()+" port: "+node.getPort());
+			println("Sent ack ("+ackToSend.getAck()[0]+")");
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	} // end sendAckResponse
-	
+
+	/**
+	 * Special print method needed for printing with the Terminal in while loops/threaded apps.
+	 * 
+	 * @param message
+	 */
 	private synchronized void println(String message){
 		try {
 			sleep(20);
