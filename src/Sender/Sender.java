@@ -78,6 +78,8 @@ public class Sender {
 			//Create buffer to be length of file
 			dataToSend = new byte[(int) file.length()];
 			FileInputStream fileInput = new FileInputStream(file);
+			fileInput.read(dataToSend);
+			fileInput.close();
 			dataBytesSent = 0;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
