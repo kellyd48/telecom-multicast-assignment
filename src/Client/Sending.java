@@ -11,31 +11,46 @@ import tcdIO.*;
 public class Sending extends Transmission implements Runnable {
 	
 	private Sender s;
-	protected Terminal terminal;
+	private Terminal terminal;
 	private String testingSenderFile = "";
 	private DatagramPacket packet;
 
-	public Sending(MulticastSocket mSocket, InetAddress mAddress,
+	/**
+	 * Sending Constructor
+	 * @param mSocket
+	 * @param mAddress
+	 * @param state
+	 * @param clientNodeList
+	 * @param senderNodeList
+	 * @param ID
+	 * @param terminal
+	 * @param testingSenderFile
+	 */
+	public Sending (MulticastSocket mSocket, InetAddress mAddress,
 			CLIENT_STATE state, ClientNodeList clientNodeList,
 			ClientNodeList senderNodeList, Identifier ID, Terminal terminal, String testingSenderFile) {
 		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, terminal);
 		this.terminal = terminal;
 		this.testingSenderFile = testingSenderFile;
 		this.s = new Sender(ID);
-	}
+	} // end Sending constructor
 
+	/**
+	 * Run method - State Machine for sending packets
+	 */
 	@Override
 	public void run() {
 		while(state != CLIENT_STATE.CLOSED) {
 			switch(state) {
-				case JOIN_GROUP:
+				case JOIN_GROUP: {
 					//sends hello packets
 					println("Sender state: "+state.toString());
 					sendHello();
 					state = CLIENT_STATE.LISTENING;
 					println("Sender state: "+state.toString());
 					break;
-				case LISTENING:
+				} // end JOIN_GROUP case
+				case LISTENING: {
 					//waiting for image to send
 					//send hello packet at certain intervals
 					if(!testingSenderFile.equals("")){ // if image path is empty
@@ -46,7 +61,8 @@ public class Sending extends Transmission implements Runnable {
 						testingSenderFile = "";
 					}
 					break;
-				case SENDING_IMAGE:
+				} // end LISTENING case
+				case SENDING_IMAGE: {
 					//sends next image packet
 					println("Sender state: "+state.toString());
 					if(senderNodeList.checkForAck(Ack.getPrevious(s.getSequence())) || senderNodeList.checkForAck(null)){
@@ -56,6 +72,7 @@ public class Sending extends Transmission implements Runnable {
 					runSender(s);
 					println("Sending");
 					break;
+				} // end SENDING_IMAGE case
 				case RECEIVING_IMAGE:
 					//does nothing
 					break;
@@ -69,8 +86,8 @@ public class Sending extends Transmission implements Runnable {
 			catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
-	}
+		} // end while
+	} // end run method
 	
 	/**
 	 * Send hello packets
@@ -88,7 +105,7 @@ public class Sending extends Transmission implements Runnable {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-	} // end sendHello
+	} // end sendHello method
 	
 	/**
 	 * Sends image packets
@@ -108,13 +125,13 @@ public class Sending extends Transmission implements Runnable {
 			System.err.println("Error for Client ID: " + ID.toString());
 			e.printStackTrace();
 		}
-	} // end runSender
+	} // end runSender method
 	
 	/**
 	 *	Updates the senderNodeList to contain the current state of the clientNodeList. 
 	 */
 	public synchronized void updateSenderNodeList(){
 		senderNodeList = new ClientNodeList(clientNodeList);
-	}
+	} // end updateSenderNodeList method
 	
-}
+} // end Sending class

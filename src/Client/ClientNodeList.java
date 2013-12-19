@@ -24,14 +24,18 @@ public class ClientNodeList {
 		this.terminal = terminal;
 		nodeList = new HashMap<Integer, ClientNode>();
 		myID = new Identifier(ID);
-	}
+	} // end ClientNodeList constructor
 	
+	/**
+	 * ClientNodeList Constructor
+	 * @param otherList
+	 */
 	public ClientNodeList(ClientNodeList otherList){
 		this.terminal = otherList.getTerminal();
 		this.myID = getMyID();
 		nodeList = new HashMap<Integer, ClientNode>();
 		nodeList.putAll(otherList.getMap());
-	}
+	} // end ClientNodeList constructor
 
 	/**
 	 * Returns ClientNode object mapped to the key passed.
@@ -40,7 +44,7 @@ public class ClientNodeList {
 	 */
 	public ClientNode getClientNode(int key){
 		return nodeList.get(key);
-	}
+	} // end getClientNode method
 	
 	/**
 	 * Returns boolean for whether a ClientNode is contained in the list of nodes.
@@ -49,7 +53,7 @@ public class ClientNodeList {
 	 */
 	public boolean clientNodeLookup(ClientNode node){
 		return nodeList.containsKey(node.getID().getIdentifier());
-	}
+	} // end clientNodeLookup method
 
 	/**
 	 * Adds a ClientNode to the list of nodes.
@@ -61,8 +65,8 @@ public class ClientNodeList {
 			nodeList.put(node.getID().getIdentifier(), node);
 			terminal.println("Client added " + node.getID().toString());
 			terminal.println(node.toString());
-		}
-	}
+		} // end if
+	} // end add method
 
 	/**
 	 * Removes a ClientNode from a list of nodes.
@@ -72,7 +76,7 @@ public class ClientNodeList {
 	public void remove(ClientNode node){
 		if(clientNodeLookup(node))
 			nodeList.remove(node.getID().getIdentifier());
-	}
+	} // add remove method
 	
 	/**
 	 * Returns the node at a certain index
@@ -89,10 +93,10 @@ public class ClientNodeList {
 				@SuppressWarnings("unchecked")
 				Map.Entry<Integer, ClientNode> node = (Map.Entry<Integer, ClientNode>)iterator.next();
 				return (ClientNode)node.getValue();
-			}
-		}
+			} // end if
+		} // end for
 		return null;
-	}
+	} // end get method
 
 	/**
 	 * Returns the size of the list
@@ -100,7 +104,7 @@ public class ClientNodeList {
 	 */
 	public int size(){
 		return nodeList.size();
-	}
+	} // end size method
 
 	/**
 	 * Returns the Identifier myID
@@ -109,7 +113,7 @@ public class ClientNodeList {
 	 */
 	public Identifier getMyID(){
 		return myID;
-	}
+	} // end getMyID method
 
 	/**
 	 * Returns the HashMap nodeList
@@ -117,7 +121,7 @@ public class ClientNodeList {
 	 */
 	public HashMap<Integer, ClientNode> getMap(){
 		return nodeList;
-	}
+	} // end HashMap method
 
 	/**
 	 * Returns reference to terminal.
@@ -125,7 +129,7 @@ public class ClientNodeList {
 	 */
 	public Terminal getTerminal(){
 		return terminal;
-	}
+	} // end getTerminal method
 
 	/**
 	 * Updates the ack stored in the ClientNode mapped to ID.
@@ -135,7 +139,7 @@ public class ClientNodeList {
 	public void updateAck(Identifier ID, Ack ack){
 		ClientNode node = nodeList.get(ID.getIdentifier());
 		node.setAck(ack);
-	}
+	} // end updateAck method
 	
 	/**
 	 * Checks for ack with the value provided.
@@ -156,8 +160,11 @@ public class ClientNodeList {
 				return true;
 		}
 		return false;
-	}
+	} // end checkForAck method
 	
+	/**
+	 * toString method
+	 */
 	public String toString(){
 		String toString = "";
 		@SuppressWarnings("rawtypes")
@@ -170,5 +177,5 @@ public class ClientNodeList {
 			toString += "Key: " + node.getKey() + " Client: " + node.getValue().toString() + "\n";
 		}
 		return toString;
-	}
-}
+	} // end toString method
+} // end ClientNodeList class

@@ -14,8 +14,18 @@ public abstract class Transmission {
 	protected ClientNodeList clientNodeList;
 	protected ClientNodeList senderNodeList;
 	protected Identifier ID;
-	protected Terminal terminal;
+	private Terminal terminal;
 	
+	/**
+	 * Transmission Constructor
+	 * @param mSocket
+	 * @param mAddress
+	 * @param state
+	 * @param clientNodeList
+	 * @param senderNodeList
+	 * @param ID
+	 * @param terminal
+	 */
 	public Transmission(MulticastSocket mSocket, InetAddress mAddress, CLIENT_STATE state,
 			ClientNodeList clientNodeList, ClientNodeList senderNodeList, Identifier ID, Terminal terminal) {
 		this.mSocket = mSocket;
@@ -25,8 +35,13 @@ public abstract class Transmission {
 		this.senderNodeList = senderNodeList;
 		this.ID = ID;
 		this.terminal = terminal;
-	}
+	} // end Transmission method
 	
+	/**
+	 * Prints a message to the terminal
+	 * 20 millisecond sleep, to allow threads to print to terminal properly
+	 * @param message
+	 */
 	public synchronized void println(String message) {
 		try {
 			Thread.sleep(20);
@@ -35,5 +50,5 @@ public abstract class Transmission {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-}
+	} // end println method
+} // end Transmission class

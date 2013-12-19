@@ -11,16 +11,29 @@ import tcdIO.*;
 public class Listening extends Transmission implements Runnable {
 
 	private Receiver r;
-	protected Terminal terminal;
+	private Terminal terminal;
 	
+	/**
+	 * Listening Constructor
+	 * @param mSocket
+	 * @param mAddress
+	 * @param state
+	 * @param clientNodeList
+	 * @param senderNodeList
+	 * @param ID
+	 * @param terminal
+	 */
 	public Listening(MulticastSocket mSocket, InetAddress mAddress,
 			CLIENT_STATE state, ClientNodeList clientNodeList,
 			ClientNodeList senderNodeList, Identifier ID, Terminal terminal) {
 		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, terminal);
 		this.terminal = terminal;
 		this.r = new Receiver(ID);
-	}
+	} // end Listening constructor
 
+	/**
+	 * Run method listens for packets on the socket and processes them
+	 */
 	@Override
 	public void run() {
 		try {
@@ -37,7 +50,7 @@ public class Listening extends Transmission implements Runnable {
 		catch(IOException e) {
 			System.err.println("Socket closed prematurely");
 		}
-	}
+	} // end run method
 	
 	/**
 	 * Processes a packet
@@ -45,7 +58,8 @@ public class Listening extends Transmission implements Runnable {
 	 * @throws IOException
 	 */
 	public synchronized void receivePacket(DatagramPacket p) throws IOException {
-		assert(p != null);
+		assert(p != null) : "Processed packet is null";
+		
 		byte[] packetData = p.getData();
 		Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
 		//checks if the packet received originated from the local client
@@ -56,13 +70,13 @@ public class Listening extends Transmission implements Runnable {
 					clientNodeList.add(node);
 					println("Received Hello Packet from " +identifier.toString() + " " +p.getAddress());
 					break;
-				} // end HELLO
+				} // end HELLO case
 				case IMAGE_METADATA: {
 					if(state != CLIENT_STATE.RECEIVING_IMAGE){
 						println("Received Metadata for Image");
 						state = CLIENT_STATE.RECEIVING_IMAGE;
 					}
-				} // end IMAGE_METADATA
+				} // end IMAGE_METADATA case
 				case IMAGE: {
 					if(state == CLIENT_STATE.RECEIVING_IMAGE){
 						println("Received Image Packet");
@@ -72,14 +86,14 @@ public class Listening extends Transmission implements Runnable {
 						state = CLIENT_STATE.RECEIVING_IMAGE;
 					}
 					break;
-				} // end IMAGE
+				} // end IMAGE case
 				case ACK: {
 					if(state == CLIENT_STATE.SENDING_IMAGE){
 						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
 								new Ack(Multicast.getHeaderData(packetData)));
 					}	
 					break;
-				} // end ACK
+				} // end ACK case
 				default: {
 					break;
 				}
@@ -88,7 +102,7 @@ public class Listening extends Transmission implements Runnable {
 		else {
 			// ignore packets received by this node sent to itself over multicast
 		}
-	} // end receivePacket
+	} // end receivePacket method
 
 	/**
 	 * Sends an ACK over the multicast socket.
@@ -96,7 +110,7 @@ public class Listening extends Transmission implements Runnable {
 	 * @param ackToSend
 	 */
 	public synchronized void sendAckResponse(Identifier ID, Ack ackToSend) {
-		assert(ID != null && ackToSend != null);
+		assert(ID != null && ackToSend != null) : "Sending ack Response error";
 		
 		byte[] data = Multicast.constructAckPacket(ID, ackToSend);
 		try {
@@ -107,6 +121,6 @@ public class Listening extends Transmission implements Runnable {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-	} // end sendAckResponse
+	} // end sendAckResponse method
 	
-}
+} // end Listening class

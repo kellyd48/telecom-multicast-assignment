@@ -19,26 +19,38 @@ public class Identifier {
 	 */
 	public Identifier(){
 		identifier = getTimestampID();
-	}
+	} // end Identifier constructor
 	
+	/**
+	 * Identifier Constructor.
+	 * @param id
+	 */
 	public Identifier(Identifier id){
 		this.identifier = id.getIdentifier();
-	}
+	} // end Identifier constructor
 	
+	/**
+	 * Identifier Constructor.
+	 * @param identifier
+	 */
 	public Identifier(byte[] identifier){
 		this(toInt(identifier));
-	}
+	} // end Identifier constructor
 	
+	/**
+	 * Identifier Constructor.
+	 * @param identifier
+	 */
 	public Identifier(int identifier){
 		this.identifier = identifier;
-	}
+	} // end Identifier constructor
 	
 	/**
 	 * Returns the identification code as an integer.
 	 */
 	public int getIdentifier(){
 		return this.identifier;
-	}
+	} // end getIdentifier method
 	
 	/**
 	 * Returns id constructed from hash of current timestamp. (id is an integer)
@@ -47,7 +59,7 @@ public class Identifier {
 		Date date = new Date();
 		Timestamp timestamp = new Timestamp(date.getTime());
 		return timestamp.hashCode();
-	}
+	} // end getTimestampID method
 	
 	/**
 	 * Takes array of Identifier bytes and converts it to integer form.
@@ -62,7 +74,7 @@ public class Identifier {
 			identifier = identifier + ((bytes[i] & mask) << (i * 8));
 		}
 		return identifier;
-	}
+	} // end toInt method
 	
 	/**
 	 * Converts id internally stored as an int into an array of bytes.
@@ -74,7 +86,7 @@ public class Identifier {
 		    identifier[i] = (byte)(this.identifier >> (i * 8));
 		}
 		return identifier;
-	} 
+	} // end toBytes method
 
 	/**
 	 * Checks if two Identifier objects are equal.
@@ -83,9 +95,12 @@ public class Identifier {
 	 */
 	public boolean equals(Identifier otherID){
 		return this.identifier == otherID.getIdentifier();
-	}
+	} // end equals method
 	
+	/**
+	 * toString method
+	 */
 	public String toString(){
 		return Integer.toString(identifier);
-	}
-}
+	} // end toString method
+} // end Identifier class

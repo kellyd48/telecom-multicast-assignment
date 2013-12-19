@@ -6,7 +6,7 @@ import java.net.MulticastSocket;
 import Client.Transmission.*;
 import tcdIO.*;
 
-public class Client implements Runnable{
+public class Client implements Runnable {
 
 	private MulticastSocket mSocket;
 	private InetAddress mAddress;
@@ -23,10 +23,17 @@ public class Client implements Runnable{
 		new Thread(new Client("doge.jpeg")).start();
 	}
 	
+	/**
+	 * Default Constructor
+	 */
 	public Client() {
 		this("");
-	}
+	} // end Client constructor
 	
+	/**
+	 * Client Constructor
+	 * @param testingSenderFile
+	 */
 	public Client(String testingSenderFile) {
 		ID = new Identifier();
 		this.testingSenderFile = testingSenderFile;
@@ -41,8 +48,11 @@ public class Client implements Runnable{
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+	} // end Client constructor
 
+	/**
+	 * Run method starts listener and sender threads
+	 */
 	@Override
 	public void run() {
 		// create and start send and listener threads
@@ -50,6 +60,6 @@ public class Client implements Runnable{
 				clientNodeList, ID, terminal, testingSenderFile)).start();
 		new Thread(new Listening(mSocket, mAddress, state, clientNodeList, 
 				clientNodeList, ID, terminal)).start();	
-	}
+	} // end run method
 
-}
+} // end Client abstract class

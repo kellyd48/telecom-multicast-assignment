@@ -8,7 +8,7 @@ public class Ack {
 	 */
 	public Ack(){
 		ackBytes = constructAck((byte) 1);
-	}
+	} // end Ack constructor
 	
 	/**
 	 * Constructs ack from another Ack object.
@@ -16,7 +16,7 @@ public class Ack {
 	 */
 	public Ack(Ack ack){
 		ackBytes = ack.getAck();
-	}
+	} // end Ack constructor
 	
 	/**
 	 * Constructs ack from byte array
@@ -25,7 +25,7 @@ public class Ack {
 	public Ack(byte[] ack){
 		assert(ack.length == Multicast.ACK_LENGTH);
 		System.arraycopy(ack, 0, ackBytes, 0, ackBytes.length);
-	}
+	} // end Ack constructor
 	
 	/**
 	 * Just creates a new ack with the sequence number provided.
@@ -35,7 +35,7 @@ public class Ack {
 	 */
 	public static byte[] constructAck(byte sequence){
 		return new byte[]{sequence, 0, 0};
-	}
+	} // end constructAck method
 	
 	/**
 	 * Returns byte array of next ack.
@@ -47,7 +47,7 @@ public class Ack {
 			return constructAck((byte)0);
 		else
 			return constructAck((byte)1);
-	}
+	} // end nextAck method
 	
 	/**
 	 * Returns previous ack.
@@ -57,14 +57,14 @@ public class Ack {
 	 */
 	public static Ack getPrevious(Ack ack){
 		return nextExpectedAck(ack);
-	}
+	} // end getPrevious method
 	
 	/**
 	 * Updates internally stored ack to the next Ack.
 	 */
 	public void next(){
 		ackBytes = nextAck(ackBytes);
-	}
+	} // end next method
 	
 	/**
 	 * Returns Ack object of next expected ack.
@@ -74,7 +74,7 @@ public class Ack {
 	 */
 	public static Ack nextExpectedAck(Ack ack){
 		return new Ack(Ack.nextAck(ack.getAck()));
-	}
+	} // end nextExpectedAck method
 	
 	/**
 	 * Checks if ack1 is internally equal to ack2
@@ -87,9 +87,9 @@ public class Ack {
 		for(int i = 0; i < Multicast.ACK_LENGTH; i++){
 			if(ack1.getAck()[i] == ack2.getAck()[i])
 				return false;
-		}
+		} // end for
 		return true;
-	}
+	} // end equals method
 	
 	/**
 	 * Returns byte array of internally stored ack.
@@ -97,5 +97,5 @@ public class Ack {
 	 */
 	public byte[] getAck(){
 		return ackBytes;
-	}
-}
+	} // end getAck method
+} // end Ack class
