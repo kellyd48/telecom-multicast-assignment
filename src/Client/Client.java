@@ -184,41 +184,50 @@ public class Client {
 			r = new Receiver(ID);
 		} // end constructor
 
+		/**
+		 * Listens for packets on the mSocket
+		 */
 		@Override
 		public void run() {
 			try {
-				receivePacket();		
+				DatagramPacket p = null;
+				byte[] data= new byte[Multicast.MTU];  
+				while(true) {
+					p = new DatagramPacket(data, data.length);
+					// listen for packet 
+					mSocket.receive(p);	
+					// process it
+					receivePacket(p);
+				} // end while
 			}
 			catch(IOException e) {
-				mSocket.close();
 				System.out.println("Socket closed prematurely");
 			}
 		} // end run
 
 		/**
-		 * Receive packets from the multicast socket 
+		 * Processes a packet
+		 * @param p
 		 * @throws IOException
 		 */
-		public synchronized void receivePacket() throws IOException{
-			DatagramPacket p = null;
-			byte[] data= new byte[Multicast.MTU];  
-			while(true){
-				p = new DatagramPacket(data, data.length);
-				mSocket.receive(p);
-				byte[] packetData = p.getData();
-				Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
-				if(!identifier.equals(ID)){
-					switch(Multicast.getPacketType(packetData)){
-					case HELLO:
-						receiveHello(p.getAddress(), p.getPort(), identifier);
+		public synchronized void receivePacket(DatagramPacket p) throws IOException {
+			byte[] packetData = p.getData();
+			Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
+			if(!identifier.equals(ID)) {
+				switch(Multicast.getPacketType(packetData)) {
+					case HELLO: {
+						ClientNode node = new ClientNode(address, p.getPort(), identifier);
+						clientNodeList.add(node);
 						terminal.println("Received Hello Packet from " +identifier.toString() + " " +p.getAddress());
 						break;
-					case IMAGE_METADATA:
+					} // end HELLO
+					case IMAGE_METADATA: {
 						if(state != CLIENT_STATE.RECEIVING_IMAGE){
 							terminal.println("Received Metadata for Image");
 							state = CLIENT_STATE.RECEIVING_IMAGE;
 						}
-					case IMAGE:
+					} // end IMAGE_METADATA
+					case IMAGE: {
 						if(state == CLIENT_STATE.RECEIVING_IMAGE){
 							terminal.println("Received Image Packet");
 							r.receivePacket(packetData);
@@ -227,30 +236,27 @@ public class Client {
 							state = CLIENT_STATE.RECEIVING_IMAGE;
 						}
 						break;
-					case ACK:
+					} // end IMAGE
+					case ACK: {
 						if(state == CLIENT_STATE.SENDING_IMAGE){
-							senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), new Ack(Multicast.getHeaderData(packetData)));
+							senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
+									new Ack(Multicast.getHeaderData(packetData)));
 						}	
 						break;
-					default:
+					} // end ACK
+					default: {
 						break;
 					}
-				}
-			}
-		}
-
+				} // end switch
+			} // end if
+		} // end receivePacket
+		
 		/**
-		 * Hello Packet Handler - Creates a new node in the membership list
-		 * @param address
-		 * @param port
-		 * @param identifier
+		 * Sends an ACK over a datagram socket
+		 * @param ID
+		 * @param ackToSend
 		 */
-		public synchronized void receiveHello(InetAddress address, int port, Identifier identifier){
-			ClientNode node = new ClientNode(address, port, identifier);
-			clientNodeList.add(node);
-		}
-
-		public synchronized void sendAckResponse(Identifier ID, Ack ackToSend){
+		public synchronized void sendAckResponse(Identifier ID, Ack ackToSend) {
 			ClientNode node = clientNodeList.getClientNode(ID.getIdentifier());
 			byte[] data = Multicast.constructAckPacket(ID, ackToSend);
 			try {
@@ -258,11 +264,11 @@ public class Client {
 				dSocket.send(packet);
 				terminal.println("Sent ack ("+ackToSend.getAck()[0]+") to address: "+
 						node.getAddress().toString()+" port: "+node.getPort());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
+			} 
+			catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+		} // end sendAckResponse
 	} // end Listener 
 
 } // end Client
