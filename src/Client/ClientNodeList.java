@@ -142,13 +142,13 @@ public class ClientNodeList {
 	} // end updateAck method
 	
 	/**
-	 * Checks for ack with the value provided.
-	 * Returns true if a client has an ack with the same value
+	 * Checks all acks if they have the value passed.
+	 * Returns true only if all ClientNodes have the same value ack.
 	 * 
 	 * @param ack
 	 * @return
 	 */
-	public boolean checkForAck(Ack ack){
+	public boolean checkAllAcks(Ack ack){
 		@SuppressWarnings("rawtypes")
 		Set nodes = nodeList.entrySet();
 		@SuppressWarnings("rawtypes")
@@ -156,10 +156,12 @@ public class ClientNodeList {
 		while(iterator.hasNext()){
 			@SuppressWarnings("unchecked")
 			Map.Entry<Integer, ClientNode> node = (Map.Entry<Integer, ClientNode>)iterator.next();
-			if(node.getValue().getAck() != null && Ack.equals(node.getValue().getAck(), ack))
-				return true;
+			if(node.getValue().getAck() == null)
+				return false;
+			if(!Ack.equals(node.getValue().getAck(), ack))
+				return false;
 		}
-		return false;
+		return true;
 	} // end checkForAck method
 	
 	/**

@@ -7,10 +7,43 @@ import Client.Transmission.*;
 import tcdIO.*;
 
 public class Client implements Runnable {
+	
+	/**
+     * Class to represent the state of the client.
+     *
+     */
+    public static class ClientState{
+            public enum State {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE, CLOSED};
+            public State state;
+            
+            public ClientState(){
+                    this(State.JOIN_GROUP);
+            }
+            
+            public ClientState(State state){
+                    this.state = state;
+            }
+            
+            public boolean equals(State state){
+                    return (this.state == state);
+            }
+            
+            public State get(){
+                    return state;
+            }
+            
+            public void set(State state){
+                    this.state = state;
+            }
+    
+            public String toString(){
+             return state.toString();        
+            }
+    }
 
 	private MulticastSocket mSocket;
 	private InetAddress mAddress;
-	private CLIENT_STATE state;
+	private ClientState state;
 	private ClientNodeList clientNodeList;
 	private ClientNodeList senderNodeList;
 	private Identifier ID;
@@ -37,7 +70,7 @@ public class Client implements Runnable {
 	public Client(String testingSenderFile) {
 		ID = new Identifier();
 		this.testingSenderFile = testingSenderFile;
-		state = CLIENT_STATE.JOIN_GROUP;
+		state = new ClientState();
 		terminal = new Terminal("Client ID: " + ID.toString());
 		clientNodeList = new ClientNodeList(ID,terminal);
 		try {

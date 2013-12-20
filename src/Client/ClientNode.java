@@ -59,6 +59,7 @@ public class ClientNode {
 	} // end resetAck method
 
 	public String toString(){
-		return "Client Node ID: " + id.toString() + " Address: " + address.getHostAddress();
+		return "Client Node ID: " + id.toString() + " Address: " + address.getHostAddress() + 
+					(ack != null ? "Ack: "+ack.toString():"");
 	} // end toString method
 } // end ClientNode class

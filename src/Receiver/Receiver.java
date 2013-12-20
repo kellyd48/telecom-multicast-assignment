@@ -2,16 +2,15 @@ package Receiver;
 import Client.*;
 
 public class Receiver {
-	public static final String OUTPUT_FILE = "Receiver";
 	public static enum RECEIVER_STATE {RECEIVING_IMAGE, FINISHED_RECEIVING, ERROR};
 
 	private ReceiverBuffer buffer;
 	private RECEIVER_STATE state;
-	private Identifier ID;
 	private Ack ack;
+	private String outputFileName;
 
 	public Receiver(Identifier ID){
-		this.ID = new Identifier(ID);
+		outputFileName = ID.toString()+".jpeg";
 	}
 
 	public void run(byte[] packetReceived){
@@ -23,7 +22,7 @@ public class Receiver {
 					if(state != RECEIVER_STATE.RECEIVING_IMAGE){
 						ack = new Ack(Multicast.getHeaderData(packetReceived));
 						int sizeOfImage = Multicast.getImageSizeMetadataPacket(packetReceived);
-						buffer = new ReceiverBuffer(sizeOfImage, ID.toString());
+						buffer = new ReceiverBuffer(sizeOfImage, outputFileName);
 						state = RECEIVER_STATE.RECEIVING_IMAGE;
 					}
 					break;

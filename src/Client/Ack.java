@@ -85,7 +85,7 @@ public class Ack {
 	 */
 	public static boolean equals(Ack ack1, Ack ack2){
 		for(int i = 0; i < Multicast.ACK_LENGTH; i++){
-			if(ack1.getAck()[i] == ack2.getAck()[i])
+			if(ack1.getAck()[i] != ack2.getAck()[i])
 				return false;
 		} // end for
 		return true;
@@ -98,4 +98,8 @@ public class Ack {
 	public byte[] getAck(){
 		return ackBytes;
 	} // end getAck method
+
+	public String toString(){
+		return "" + ackBytes[0];
+	}
 } // end Ack class

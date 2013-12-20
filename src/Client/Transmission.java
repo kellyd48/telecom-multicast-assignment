@@ -2,6 +2,7 @@ package Client;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import Client.Client.ClientState;
 import tcdIO.*;
 
 public abstract class Transmission {
@@ -10,7 +11,7 @@ public abstract class Transmission {
 	
 	protected MulticastSocket mSocket;
 	protected InetAddress mAddress;
-	protected CLIENT_STATE state;
+	protected ClientState state;
 	protected ClientNodeList clientNodeList;
 	protected ClientNodeList senderNodeList;
 	protected Identifier ID;
@@ -26,11 +27,11 @@ public abstract class Transmission {
 	 * @param ID
 	 * @param terminal
 	 */
-	public Transmission(MulticastSocket mSocket, InetAddress mAddress, CLIENT_STATE state,
+	public Transmission(MulticastSocket mSocket, InetAddress mAddress, ClientState state,
 			ClientNodeList clientNodeList, ClientNodeList senderNodeList, Identifier ID, Terminal terminal) {
 		this.mSocket = mSocket;
 		this.mAddress = mAddress;
-		this.state = CLIENT_STATE.JOIN_GROUP;
+		this.state = state;
 		this.clientNodeList = clientNodeList;
 		this.senderNodeList = senderNodeList;
 		this.ID = ID;

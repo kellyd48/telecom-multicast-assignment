@@ -18,6 +18,7 @@ public class ReceiverBuffer {
 	private String outputFilename = "";
 	
 	public ReceiverBuffer(int sizeOfData, String outputFile){
+		state = BUFFER_STATE.READING;
 		this.sizeOfData = sizeOfData;
 		this.fileBuffer = new byte[sizeOfData];
 		this.outputFilename = outputFile;
@@ -43,13 +44,12 @@ public class ReceiverBuffer {
 		 * Which will later be written out to file.
 		 */
 		if(dataReceivedSize < sizeOfData){
-			System.arraycopy(data, 0, fileBuffer, dataReceivedSize, data.length);
+			System.arraycopy(data, 0, fileBuffer, dataReceivedSize, 
+					(sizeOfData-dataReceivedSize < data.length ? sizeOfData-dataReceivedSize:data.length));
 			dataReceivedSize += data.length;
 		}
-		else{
-			if(dataReceivedSize >= sizeOfData){
-				state = BUFFER_STATE.FULL;
-			}
+		if(dataReceivedSize >= sizeOfData){
+			state = BUFFER_STATE.FULL;
 		}
 	}
 	

@@ -2,7 +2,6 @@ package Sender;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 
 import Client.*;
 
@@ -33,12 +32,13 @@ public class Sender {
 				getImageFromFile(inputFileTest);
 				inputFileTest = "";
 			}
-			break;
 		case SEND_METADATA:
-			assert(dataToSend != null);
-			packetToSend = Multicast.constructImageMetadataPacket(ID, sequence.getAck(), dataToSend.length);
-			state = SENDER_STATE.SEND_IMAGE;
-			sequence.next();
+			if(state == SENDER_STATE.SEND_METADATA){
+				assert(dataToSend != null);
+				packetToSend = Multicast.constructImageMetadataPacket(ID, sequence.getAck(), dataToSend.length);
+				state = SENDER_STATE.SEND_IMAGE;
+				sequence.next();
+			}
 			break;
 		case SEND_IMAGE:
 			if(isComplete())

@@ -5,13 +5,13 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import Client.Client.ClientState;
 import Receiver.*;
 import tcdIO.*;
 
 public class Listening extends Transmission implements Runnable {
 
 	private Receiver r;
-	private Terminal terminal;
 	private Identifier receivingFrom;
 	
 	/**
@@ -25,10 +25,9 @@ public class Listening extends Transmission implements Runnable {
 	 * @param terminal
 	 */
 	public Listening(MulticastSocket mSocket, InetAddress mAddress,
-			CLIENT_STATE state, ClientNodeList clientNodeList,
+			ClientState state, ClientNodeList clientNodeList,
 			ClientNodeList senderNodeList, Identifier ID, Terminal terminal) {
 		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, terminal);
-		this.terminal = terminal;
 		this.r = new Receiver(ID);
 	} // end Listening constructor
 
@@ -73,10 +72,10 @@ public class Listening extends Transmission implements Runnable {
 					break;
 				} // end HELLO case
 				case IMAGE_METADATA: {
-					if(state != CLIENT_STATE.RECEIVING_IMAGE){
+					if(!state.equals(ClientState.State.RECEIVING_IMAGE)){
 						println("Received Metadata for Image");
 						receivingFrom = new Identifier(identifier);
-						state = CLIENT_STATE.RECEIVING_IMAGE;
+						state.set(ClientState.State.RECEIVING_IMAGE);
 					}
 				} // end IMAGE_METADATA case
 				case IMAGE: {
@@ -90,9 +89,10 @@ public class Listening extends Transmission implements Runnable {
 				} // end IMAGE case
 				case ACK: {
 					println("Received Ack Packet.");
-					if(state == CLIENT_STATE.SENDING_IMAGE){
+					if(state.equals(ClientState.State.SENDING_IMAGE)){
 						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
 								new Ack(Multicast.getHeaderData(packetData)));
+						println(senderNodeList.toString());
 					}	
 					break;
 				} // end ACK case
@@ -117,7 +117,7 @@ public class Listening extends Transmission implements Runnable {
 		try {
 			DatagramPacket packet = new DatagramPacket(data, Multicast.MTU, mAddress, Multicast.MCAST_PORT);
 			mSocket.send(packet);
-			println("Sent ack ("+ackToSend.getAck()[0]+")");
+			println("Sent ack ("+ackToSend.toString()+")");
 		} 
 		catch (Exception e) {
 			e.printStackTrace();

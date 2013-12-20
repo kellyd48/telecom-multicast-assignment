@@ -5,13 +5,13 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import Client.Client.ClientState;
 import Sender.*;
 import tcdIO.*;
 
 public class Sending extends Transmission implements Runnable {
 	
 	private Sender s;
-	private Terminal terminal;
 	private String testingSenderFile = "";
 	private DatagramPacket packet;
 
@@ -27,10 +27,9 @@ public class Sending extends Transmission implements Runnable {
 	 * @param testingSenderFile
 	 */
 	public Sending (MulticastSocket mSocket, InetAddress mAddress,
-			CLIENT_STATE state, ClientNodeList clientNodeList,
+			ClientState state, ClientNodeList clientNodeList,
 			ClientNodeList senderNodeList, Identifier ID, Terminal terminal, String testingSenderFile) {
 		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, terminal);
-		this.terminal = terminal;
 		this.testingSenderFile = testingSenderFile;
 		this.s = new Sender(ID);
 	} // end Sending constructor
@@ -40,13 +39,13 @@ public class Sending extends Transmission implements Runnable {
 	 */
 	@Override
 	public void run() {
-		while(state != CLIENT_STATE.CLOSED) {
-			switch(state) {
+		while(!state.equals(ClientState.State.CLOSED)) {
+			switch(state.get()) {
 				case JOIN_GROUP: {
 					//sends hello packets
 					println("Sender state: "+state.toString());
 					sendHello();
-					state = CLIENT_STATE.LISTENING;
+					state.set(ClientState.State.LISTENING);
 					println("Sender state: " + state.toString());
 					break;
 				} // end JOIN_GROUP case
@@ -56,7 +55,7 @@ public class Sending extends Transmission implements Runnable {
 					if(!testingSenderFile.equals("")){ // if image path is empty
 						updateSenderNodeList();
 						runSender(s);
-						state = CLIENT_STATE.SENDING_IMAGE;
+						state.set(ClientState.State.SENDING_IMAGE);
 						println("Sender state: "+state.toString());
 						testingSenderFile = "";
 					}
@@ -65,12 +64,13 @@ public class Sending extends Transmission implements Runnable {
 				case SENDING_IMAGE: {
 					//sends next image packet
 					println("Sender state: "+state.toString());
-					if(senderNodeList.checkForAck(Ack.getPrevious(s.getSequence())) || senderNodeList.checkForAck(null)){
+					if(senderNodeList.checkAllAcks(s.getSequence())){
+						println("Sending");
+					}else{
 						s.resend();
 						println("Resending");
 					}
 					runSender(s);
-					println("Sending");
 					break;
 				} // end SENDING_IMAGE case
 				case RECEIVING_IMAGE:
