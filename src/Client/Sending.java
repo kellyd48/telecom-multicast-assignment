@@ -47,7 +47,7 @@ public class Sending extends Transmission implements Runnable {
 					println("Sender state: "+state.toString());
 					sendHello();
 					state = CLIENT_STATE.LISTENING;
-					println("Sender state: "+state.toString());
+					println("Sender state: " + state.toString());
 					break;
 				} // end JOIN_GROUP case
 				case LISTENING: {

@@ -12,6 +12,7 @@ public class Listening extends Transmission implements Runnable {
 
 	private Receiver r;
 	private Terminal terminal;
+	private Identifier receivingFrom;
 	
 	/**
 	 * Listening Constructor
@@ -45,6 +46,7 @@ public class Listening extends Transmission implements Runnable {
 				mSocket.receive(p);	
 				// process it
 				receivePacket(p);
+				println("State: (Listener)"+state.toString());
 			} // end while
 		}
 		catch(IOException e) {
@@ -59,7 +61,6 @@ public class Listening extends Transmission implements Runnable {
 	 */
 	public synchronized void receivePacket(DatagramPacket p) throws IOException {
 		assert(p != null) : "Processed packet is null";
-		
 		byte[] packetData = p.getData();
 		Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
 		//checks if the packet received originated from the local client
@@ -74,20 +75,21 @@ public class Listening extends Transmission implements Runnable {
 				case IMAGE_METADATA: {
 					if(state != CLIENT_STATE.RECEIVING_IMAGE){
 						println("Received Metadata for Image");
+						receivingFrom = new Identifier(identifier);
 						state = CLIENT_STATE.RECEIVING_IMAGE;
 					}
 				} // end IMAGE_METADATA case
 				case IMAGE: {
-					if(state == CLIENT_STATE.RECEIVING_IMAGE){
+					// Checks that the packet originated from the expected sender.
+					if(identifier.equals(receivingFrom)){
 						println("Received Image Packet");
-						r.receivePacket(packetData);
-						r.run();
-						sendAckResponse(identifier, Ack.nextExpectedAck(r.getAck()));
-						state = CLIENT_STATE.RECEIVING_IMAGE;
+						r.run(packetData);
+						sendAckResponse(Ack.nextExpectedAck(r.getAck()));
 					}
 					break;
 				} // end IMAGE case
 				case ACK: {
+					println("Received Ack Packet.");
 					if(state == CLIENT_STATE.SENDING_IMAGE){
 						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
 								new Ack(Multicast.getHeaderData(packetData)));
@@ -109,9 +111,8 @@ public class Listening extends Transmission implements Runnable {
 	 * @param ID
 	 * @param ackToSend
 	 */
-	public synchronized void sendAckResponse(Identifier ID, Ack ackToSend) {
-		assert(ID != null && ackToSend != null) : "Sending ack Response error";
-		
+	public synchronized void sendAckResponse(Ack ackToSend) {
+		assert(ackToSend != null) : "Sending ack Response error";
 		byte[] data = Multicast.constructAckPacket(ID, ackToSend);
 		try {
 			DatagramPacket packet = new DatagramPacket(data, Multicast.MTU, mAddress, Multicast.MCAST_PORT);

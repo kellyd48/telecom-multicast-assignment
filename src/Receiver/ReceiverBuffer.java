@@ -16,7 +16,6 @@ public class ReceiverBuffer {
 	private int dataReceivedSize = 0;
 	private BUFFER_STATE state;
 	private String outputFilename = "";
-	private byte[] currentData;
 	
 	public ReceiverBuffer(int sizeOfData, String outputFile){
 		this.sizeOfData = sizeOfData;
@@ -24,7 +23,7 @@ public class ReceiverBuffer {
 		this.outputFilename = outputFile;
 	}
 	
-	public void run(){
+	public void run(byte[] currentData){
 		// iterates through state machine for the buffer
 		switch(state){
 			case READING:
@@ -37,13 +36,6 @@ public class ReceiverBuffer {
 			case COMPLETE:
 				break;
 		}
-	}
-	
-	public void updateData(byte[] data){
-		/*
-		 * updates the data array
-		 */
-		this.currentData = data;
 	}
 	
 	private void readData(byte data[]){

@@ -166,16 +166,16 @@ public class ClientNodeList {
 	 * toString method
 	 */
 	public String toString(){
-		String toString = "";
-		@SuppressWarnings("rawtypes")
-		Set nodes = nodeList.entrySet();
-		@SuppressWarnings("rawtypes")
-		Iterator iterator = nodes.iterator();
-		while(iterator.hasNext()){
-			@SuppressWarnings("unchecked")
-			Map.Entry<Integer, ClientNode> node = (Map.Entry<Integer, ClientNode>)iterator.next();
-			toString += "Key: " + node.getKey() + " Client: " + node.getValue().toString() + "\n";
-		}
-		return toString;
-	} // end toString method
+        String toString = "\nNodeList:\n";
+        @SuppressWarnings("rawtypes")
+        Set nodes = nodeList.entrySet();
+        @SuppressWarnings("rawtypes")
+        Iterator iterator = nodes.iterator();
+        while(iterator.hasNext()){
+                @SuppressWarnings("unchecked")
+                Map.Entry<Integer, ClientNode> node = (Map.Entry<Integer, ClientNode>)iterator.next();
+                toString += node.getValue().toString()+"\n";
+        }
+        return toString;
+	}//end toString method
 } // end ClientNodeList class
