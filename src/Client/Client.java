@@ -179,10 +179,10 @@ public class Client {
 			for(;;) {
 				p = new DatagramPacket(data, data.length);
 				mSocket.receive(p);
-				byte[] packetData = p.getData();
-				switch(Multicast.getPacketType(packetData)){
+				//byte[] packetData = p.getData();
+				switch(Multicast.getPacketType(p.getData())){
 				case HELLO:
-					Identifier identifier = new Identifier(Multicast.getClientIdentifier(packetData));
+					Identifier identifier = new Identifier(Multicast.getClientIdentifier(p.getData()));
 					receiveHello(p.getAddress(), p.getPort(), identifier);
 					break;
 				case IMAGE:
