@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import Receiver.Receiver.RECEIVER_STATE;
+
 /**
  * The ReceiverBuffer class takes care of storing the data being received in packets.
  * When the buffer is full it writes the buffer out to file.
@@ -29,10 +31,11 @@ public class ReceiverBuffer {
 		switch(state){
 			case READING:
 				readData(currentData);
-				break;
 			case FULL:
-				writeToFile();
-				state = BUFFER_STATE.COMPLETE;
+				if(state == BUFFER_STATE.FULL){
+					writeToFile();
+					state = BUFFER_STATE.COMPLETE;
+				}
 				break;
 			case COMPLETE:
 				break;

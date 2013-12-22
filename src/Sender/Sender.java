@@ -112,7 +112,9 @@ public class Sender {
 	
 	private byte[] getBytesFromImage(){
 		byte[] imageBytes = new byte[Multicast.DATA];
-		System.arraycopy(dataToSend, dataBytesSent, imageBytes, 0, Multicast.DATA);
+		int bytesToSend = (dataToSend.length - dataBytesSent > Multicast.DATA ? Multicast.DATA:dataToSend.length - dataBytesSent);
+		System.arraycopy(dataToSend, dataBytesSent, imageBytes, 0, bytesToSend);
+		dataBytesSent += bytesToSend;
 		return imageBytes;
 	}
 	
