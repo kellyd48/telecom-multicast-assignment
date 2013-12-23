@@ -11,7 +11,10 @@ public class Multicast {
 	 */
 	public static final String MCAST_ADDR = "230.0.0.1"; // hardcoded address for the multicast group
 	public static final int MCAST_PORT = 9013; // hardcoded port number for the multicast group
-	public static final int HELLO_TIME_INTERVAL = 200;
+	//time between hello messages.
+	public static final int HELLO_TIME_INTERVAL = 20000;
+	//time between individual hello packets.
+	public static final int HELLO_PACKET_TIME_INTERVAL = 200;
 	public static final int NUMBER_OF_PACKETS_PER_HELLO = 2;
 	
 	/*

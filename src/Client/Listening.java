@@ -80,7 +80,7 @@ public class Listening extends Transmission implements Runnable {
 				} // end IMAGE_METADATA case
 				case IMAGE: {
 					// Checks that the packet originated from the expected sender.
-					if(identifier.equals(receivingFrom)){
+					if(receivingFrom != null && identifier.equals(receivingFrom)){
 						println("Received Image Packet");
 						r.run(packetData);
 						sendAckResponse(Ack.nextExpectedAck(r.getAck()));

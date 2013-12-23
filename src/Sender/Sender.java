@@ -24,13 +24,11 @@ public class Sender {
 		this.ID = new Identifier(ID);
 	}
 	
-	public void run(String inputFileTest){
+	public void run(){
 		switch(state){
 		case WAIT_FOR_IMAGE:
-			if(!inputFileTest.equals("")){
+			if(dataToSend != null){
 				state = SENDER_STATE.SEND_METADATA;
-				getImageFromFile(inputFileTest);
-				inputFileTest = "";
 			}
 		case SEND_METADATA:
 			if(state == SENDER_STATE.SEND_METADATA){
@@ -72,7 +70,11 @@ public class Sender {
 		return (packetToSend == null ? false:true);
 	}
 	
-	private void getImageFromFile(String filename){
+	/**
+	 * Adds the image data from the file to the sender's buffer of data to send.
+	 * @param filename
+	 */
+	public void getImageFromFile(String filename){
 		try {
 			File file = new File(filename);
 			//Create buffer to be length of file
@@ -85,12 +87,6 @@ public class Sender {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private boolean checkForNewImage(){
-		//check for image in a directory
-		//if present put it in the byte array of dataToSend.
-		return false;
 	}
 	
 	/**
