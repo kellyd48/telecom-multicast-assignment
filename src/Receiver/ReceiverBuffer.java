@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import Receiver.Receiver.RECEIVER_STATE;
+
 /**
  * The ReceiverBuffer class takes care of storing the data being received in packets.
  * When the buffer is full it writes the buffer out to file.
@@ -16,34 +18,28 @@ public class ReceiverBuffer {
 	private int dataReceivedSize = 0;
 	private BUFFER_STATE state;
 	private String outputFilename = "";
-	private byte[] currentData;
 	
 	public ReceiverBuffer(int sizeOfData, String outputFile){
+		state = BUFFER_STATE.READING;
 		this.sizeOfData = sizeOfData;
 		this.fileBuffer = new byte[sizeOfData];
 		this.outputFilename = outputFile;
 	}
 	
-	public void run(){
+	public void run(byte[] currentData){
 		// iterates through state machine for the buffer
 		switch(state){
 			case READING:
 				readData(currentData);
-				break;
 			case FULL:
-				writeToFile();
-				state = BUFFER_STATE.COMPLETE;
+				if(state == BUFFER_STATE.FULL){
+					writeToFile();
+					state = BUFFER_STATE.COMPLETE;
+				}
 				break;
 			case COMPLETE:
 				break;
 		}
-	}
-	
-	public void updateData(byte[] data){
-		/*
-		 * updates the data array
-		 */
-		this.currentData = data;
 	}
 	
 	private void readData(byte data[]){
@@ -51,13 +47,12 @@ public class ReceiverBuffer {
 		 * Which will later be written out to file.
 		 */
 		if(dataReceivedSize < sizeOfData){
-			System.arraycopy(data, 0, fileBuffer, dataReceivedSize, data.length);
+			System.arraycopy(data, 0, fileBuffer, dataReceivedSize, 
+					(sizeOfData-dataReceivedSize < data.length ? sizeOfData-dataReceivedSize:data.length));
 			dataReceivedSize += data.length;
 		}
-		else{
-			if(dataReceivedSize >= sizeOfData){
-				state = BUFFER_STATE.FULL;
-			}
+		if(dataReceivedSize >= sizeOfData){
+			state = BUFFER_STATE.FULL;
 		}
 	}
 	
