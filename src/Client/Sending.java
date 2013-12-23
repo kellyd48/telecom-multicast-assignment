@@ -91,12 +91,12 @@ public class Sending extends Transmission implements Runnable {
 					break;
 			}
 			//sleep for a bit to see whats happening
-			try {
-				Thread.sleep(1000);
-			} 
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			// try {
+			// 	Thread.sleep(1000);
+			// } 
+			// catch (InterruptedException e) {
+			// 	e.printStackTrace();
+			// }
 		} // end while
 	} // end run method
 
