@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import Receiver.Receiver.RECEIVER_STATE;
 
 /**
  * The ReceiverBuffer class takes care of storing the data being received in packets.

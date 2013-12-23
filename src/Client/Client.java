@@ -46,13 +46,12 @@ public class Client implements Runnable {
 	private InetAddress mAddress;
 	private ClientState state;
 	private ClientNodeList clientNodeList;
+	@SuppressWarnings("unused")
 	private ClientNodeList senderNodeList;
 	private Identifier ID;
 	private Terminal terminal;
 	
 	public static void main(String[] args) {
-		new Thread(new Client()).start();
-		new Thread(new Client()).start();
 		new Thread(new Client()).start();
 	}
 	
