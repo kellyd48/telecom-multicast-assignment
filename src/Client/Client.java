@@ -8,6 +8,8 @@ import tcdIO.*;
 
 public class Client implements Runnable {
 	
+	public static final String IMAGE_FILENAME = "image.jpg";
+	
 	/**
      * Class to represent the state of the client.
      *
@@ -53,23 +55,15 @@ public class Client implements Runnable {
 	public static void main(String[] args) {
 		new Thread(new Client()).start();
 		new Thread(new Client()).start();
-		new Thread(new Client("doge.jpeg")).start();
+		new Thread(new Client()).start();
 	}
-	
-	/**
-	 * Default Constructor
-	 */
-	public Client() {
-		this("");
-	} // end Client constructor
 	
 	/**
 	 * Client Constructor
 	 * @param testingSenderFile
 	 */
-	public Client(String testingSenderFile) {
+	public Client() {
 		ID = new Identifier();
-		this.testingSenderFile = testingSenderFile;
 		state = new ClientState();
 		terminal = new Terminal("Client ID: " + ID.toString());
 		clientNodeList = new ClientNodeList(ID,terminal);
@@ -90,7 +84,7 @@ public class Client implements Runnable {
 	public void run() {
 		// create and start send and listener threads
 		new Thread(new Sending(mSocket,mAddress, state, clientNodeList, 
-				clientNodeList, ID, terminal, testingSenderFile)).start();
+				clientNodeList, ID, terminal)).start();
 		new Thread(new Listening(mSocket, mAddress, state, clientNodeList, 
 				clientNodeList, ID, terminal)).start();	
 	} // end run method

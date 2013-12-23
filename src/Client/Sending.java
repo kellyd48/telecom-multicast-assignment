@@ -1,5 +1,6 @@
 package Client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -12,7 +13,6 @@ import tcdIO.*;
 public class Sending extends Transmission implements Runnable {
 	
 	private Sender s;
-	private String testingSenderFile = "";
 	private DatagramPacket packet;
 
 	/**
@@ -28,9 +28,8 @@ public class Sending extends Transmission implements Runnable {
 	 */
 	public Sending (MulticastSocket mSocket, InetAddress mAddress,
 			ClientState state, ClientNodeList clientNodeList,
-			ClientNodeList senderNodeList, Identifier ID, Terminal terminal, String testingSenderFile) {
+			ClientNodeList senderNodeList, Identifier ID, Terminal terminal) {
 		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, terminal);
-		this.testingSenderFile = testingSenderFile;
 		this.s = new Sender(ID);
 	} // end Sending constructor
 
@@ -52,12 +51,11 @@ public class Sending extends Transmission implements Runnable {
 				case LISTENING: {
 					//waiting for image to send
 					//send hello packet at certain intervals
-					if(!testingSenderFile.equals("")){ // if image path is empty
+					if(checkForImage()){ // if image path is empty
 						updateSenderNodeList();
-						runSender(s);
+						runSender();
 						state.set(ClientState.State.SENDING_IMAGE);
 						println("Sender state: "+state.toString());
-						testingSenderFile = "";
 					}
 					break;
 				} // end LISTENING case
@@ -65,12 +63,16 @@ public class Sending extends Transmission implements Runnable {
 					//sends next image packet
 					println("Sender state: "+state.toString());
 					if(senderNodeList.checkAllAcks(s.getSequence())){
-						println("Sending");
+						if(s.getState() == Sender.SENDER_STATE.COMPLETED){
+							this.state.set(ClientState.State.JOIN_GROUP);
+						}else{
+							println("Sending");
+						}
 					}else{
 						s.resend();
 						println("Resending");
 					}
-					runSender(s);
+					runSender();
 					break;
 				} // end SENDING_IMAGE case
 				case RECEIVING_IMAGE:
@@ -89,6 +91,25 @@ public class Sending extends Transmission implements Runnable {
 		} // end while
 	} // end run method
 	
+	private boolean checkForImage(){
+		//check for image in a directory
+		//if present put it in the byte array of dataToSend.
+		File imageFile = new File(Client.IMAGE_FILENAME);
+		if(imageFile.exists() && s.getState() == Sender.SENDER_STATE.WAIT_FOR_IMAGE){
+			s.getImageFromFile(Client.IMAGE_FILENAME);
+			File renamedFile;
+			int i = 0;
+			do{
+				String append = (i == 0 ? "":"_"+i);
+				renamedFile = new File(this.ID.toString() + append + ".jpg");
+				i++;
+			}while(renamedFile.exists());
+			imageFile.renameTo(renamedFile);
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Send hello packets
 	 */
@@ -99,7 +120,7 @@ public class Sending extends Transmission implements Runnable {
 			for(int i = 0; i < Multicast.NUMBER_OF_PACKETS_PER_HELLO; i++) {
 				mSocket.send(packet);
 				println("Sent Hello Packet.");
-				Thread.sleep(Multicast.HELLO_TIME_INTERVAL);
+				Thread.sleep(Multicast.HELLO_PACKET_TIME_INTERVAL);
 			}
 		} 
 		catch (Exception e) {
@@ -111,9 +132,9 @@ public class Sending extends Transmission implements Runnable {
 	 * Sends image packets
 	 * @param s
 	 */
-	public synchronized void runSender(Sender s){
+	public synchronized void runSender(){
 		try {
-			s.run(testingSenderFile);
+			s.run();
 			if(s.hasPacketToSend()){
 				byte[] packetData = s.packetToSend();
 				packet = new DatagramPacket(packetData, packetData.length, mAddress, Multicast.MCAST_PORT);
