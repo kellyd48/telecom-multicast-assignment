@@ -65,7 +65,11 @@ public class Sending extends Transmission implements Runnable {
 					//sends next image packet
 					println("Sender state: "+state.toString());
 					if(senderNodeList.checkAllAcks(s.getSequence())){
-						println("Sending");
+						if(s.getState() == Sender.SENDER_STATE.COMPLETED){
+							this.state.set(ClientState.State.JOIN_GROUP);
+						}else{
+							println("Sending");
+						}
 					}else{
 						s.resend();
 						println("Resending");

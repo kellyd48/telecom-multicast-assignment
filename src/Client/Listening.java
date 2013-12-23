@@ -72,7 +72,7 @@ public class Listening extends Transmission implements Runnable {
 					break;
 				} // end HELLO case
 				case IMAGE_METADATA: {
-					if(!state.equals(ClientState.State.RECEIVING_IMAGE)){
+					if(!state.equals(ClientState.State.RECEIVING_IMAGE) && receivingFrom == null){
 						println("Received Metadata for Image");
 						receivingFrom = new Identifier(identifier);
 						state.set(ClientState.State.RECEIVING_IMAGE);
@@ -84,6 +84,10 @@ public class Listening extends Transmission implements Runnable {
 						println("Received Image Packet");
 						r.run(packetData);
 						sendAckResponse(Ack.nextExpectedAck(r.getAck()));
+						if(r.getState() == Receiver.RECEIVER_STATE.FINISHED_RECEIVING){
+							receivingFrom = null;
+							this.state.set(ClientState.State.JOIN_GROUP);
+						}
 					}
 					break;
 				} // end IMAGE case

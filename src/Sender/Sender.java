@@ -136,4 +136,12 @@ public class Sender {
 		packetToSend = null;
 		return lastPacketSent;
 	}
+
+	/**
+	 * Returns the state of the Sender.
+	 * @return
+	 */
+	public SENDER_STATE getState(){
+		return state;
+	}
 }
