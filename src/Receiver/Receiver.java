@@ -1,15 +1,11 @@
 package Receiver;
 
 import java.io.File;
-
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import Client.*;
 
-public class Receiver extends JPanel{
-	// eclipse added this
-	private static final long serialVersionUID = 1L;
+public class Receiver {
 
 	public static enum RECEIVER_STATE {RECEIVING_IMAGE, FINISHED_RECEIVING, ERROR};
 
