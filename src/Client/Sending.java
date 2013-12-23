@@ -5,13 +5,14 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.sql.Timestamp;
 
 import Client.Client.ClientState;
 import Sender.*;
 import tcdIO.*;
 
 public class Sending extends Transmission implements Runnable {
-	
+
 	private Sender s;
 	private DatagramPacket packet;
 
@@ -38,6 +39,7 @@ public class Sending extends Transmission implements Runnable {
 	 */
 	@Override
 	public void run() {
+		long lastTime = 0;
 		while(!state.equals(ClientState.State.CLOSED)) {
 			switch(state.get()) {
 				case JOIN_GROUP: {
@@ -46,16 +48,24 @@ public class Sending extends Transmission implements Runnable {
 					sendHello();
 					state.set(ClientState.State.LISTENING);
 					println("Sender state: " + state.toString());
+					lastTime = System.currentTimeMillis();
 					break;
 				} // end JOIN_GROUP case
 				case LISTENING: {
 					//waiting for image to send
 					//send hello packet at certain intervals
-					if(checkForImage()){ // if image path is empty
+					if(checkForImage()){
 						updateSenderNodeList();
 						runSender();
 						state.set(ClientState.State.SENDING_IMAGE);
 						println("Sender state: "+state.toString());
+					}
+					else{
+						long now = System.currentTimeMillis();
+						if(now - lastTime >= Multicast.HELLO_TIME_INTERVAL){
+							this.state.set(ClientState.State.JOIN_GROUP);
+							println("Hello message time interval reached.");
+						}
 					}
 					break;
 				} // end LISTENING case
@@ -90,7 +100,7 @@ public class Sending extends Transmission implements Runnable {
 			}
 		} // end while
 	} // end run method
-	
+
 	private boolean checkForImage(){
 		//check for image in a directory
 		//if present put it in the byte array of dataToSend.
@@ -103,13 +113,13 @@ public class Sending extends Transmission implements Runnable {
 				String append = (i == 0 ? "":"_"+i);
 				renamedFile = new File(this.ID.toString() + append + ".jpg");
 				i++;
-			}while(renamedFile.exists());
+			}while(renamedFile.isFile());
 			imageFile.renameTo(renamedFile);
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Send hello packets
 	 */
@@ -127,7 +137,7 @@ public class Sending extends Transmission implements Runnable {
 			e.printStackTrace();
 		}
 	} // end sendHello method
-	
+
 	/**
 	 * Sends image packets
 	 * @param s
@@ -147,12 +157,12 @@ public class Sending extends Transmission implements Runnable {
 			e.printStackTrace();
 		}
 	} // end runSender method
-	
+
 	/**
 	 *	Updates the senderNodeList to contain the current state of the clientNodeList. 
 	 */
 	public synchronized void updateSenderNodeList(){
 		senderNodeList = new ClientNodeList(clientNodeList);
 	} // end updateSenderNodeList method
-	
+
 } // end Sending class
