@@ -1,5 +1,7 @@
 package Receiver;
 
+import java.io.File;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -19,7 +21,6 @@ public class Receiver extends JPanel{
 
 	public Receiver(Identifier ID){
 		this.id = ID;
-		outputFileName = ID.toString()+".jpeg";
 	}
 
 	public void run(byte[] packetReceived){
@@ -31,6 +32,7 @@ public class Receiver extends JPanel{
 					if(state != RECEIVER_STATE.RECEIVING_IMAGE){
 						ack = new Ack(Multicast.getHeaderData(packetReceived));
 						int sizeOfImage = Multicast.getImageSizeMetadataPacket(packetReceived);
+						outputFileName = newOutputFilename();
 						buffer = new ReceiverBuffer(sizeOfImage, outputFileName);
 						state = RECEIVER_STATE.RECEIVING_IMAGE;
 					}
@@ -56,6 +58,18 @@ public class Receiver extends JPanel{
 		}
 	}
 
+	private String newOutputFilename(){
+		assert(this.id != null);
+		File file;
+		int i = 0;
+		do{
+			String append = (i == 0 ? "":"_"+i);
+			file = new File(this.id.toString() + append + ".jpg");
+			i++;
+		}while(file.isFile());
+		return file.getPath();
+	}
+	
 	public Ack getAck(){
 		return ack;
 	}
