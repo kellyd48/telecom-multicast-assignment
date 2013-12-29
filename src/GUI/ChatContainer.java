@@ -1,6 +1,10 @@
 package GUI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.swing.ImageIcon;
@@ -8,10 +12,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class ChatContainer extends JPanel{
+	private final int WIDTH = 600;
+	private final int HEIGHT = 600;
 	
 	public ChatContainer(){
-		this.setPreferredSize(new Dimension(600,600));
+		this.setPreferredSize(new Dimension(WIDTH,HEIGHT));
 			ImageIcon image = createImageIcon("img/img.jpg","img.jpg");
+			if(isImageTooBig(image)){
+				image = resizeImage(image);
+			}
 			JLabel label = new JLabel("",image,JLabel.CENTER);
 			this.add(label);
 	}
@@ -27,9 +36,45 @@ public class ChatContainer extends JPanel{
 		}
 	}
 	
-	private ImageIcon resizeImage(ImageIcon image){
-		return image;
+	private boolean isImageTooBig(ImageIcon srcImage){
+		if(srcImage.getIconHeight()>HEIGHT || srcImage.getIconWidth()>WIDTH)
+			return true;
+		return false;
 	}
 	
+	private ImageIcon resizeImage(ImageIcon srcImage){
+		ImageIcon iImage = null;
+		
+        if(srcImage.getIconHeight()>HEIGHT){
+        	double h = 600;
+        	double w = h/srcImage.getIconHeight()*srcImage.getIconWidth();
+        	iImage = resizeImage(srcImage, (int)w, (int)h);
+        }
+        else if(srcImage.getIconWidth()>WIDTH){
+        	double w = 600;
+        	double h = w/srcImage.getIconWidth()*srcImage.getIconHeight();
+        	iImage = resizeImage(srcImage, (int)w, (int)h);
+        }
+        else{
+        	double h = 600;
+        	double w = 600;
+        	iImage = resizeImage(srcImage, (int)w, (int)h);
+        }
+
+        return iImage;
+	}
+	
+	private ImageIcon resizeImage(ImageIcon srcImage, int w, int h){
+		ImageIcon iImage = null;
+
+        BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = resizedImg.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(srcImage.getImage(), 0, 0, w, h, null);
+        g2.dispose();
+        iImage =new ImageIcon(resizedImg);
+	        
+        return iImage;
+	}
 	
 }
