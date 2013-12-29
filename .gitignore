@@ -5,3 +5,4 @@ bin/*
 .class
 #Don't ignore the .project
 .classpath
+/bin
