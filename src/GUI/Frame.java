@@ -12,12 +12,14 @@ public class Frame {
 	static public void createAndShowGUI(){
 		JFrame frame = new JFrame("Snapchat v1.0");
 		ChatContainer chatContainer = new ChatContainer();
+		ProgressBarContainer progressBarContainer = new ProgressBarContainer();
 		SystemMessageContainer sysMsgContainer = new SystemMessageContainer("Waiting...");
 
 		frame.setLayout(new BorderLayout());
 		
-		frame.add(chatContainer, BorderLayout.NORTH);
-		frame.add(sysMsgContainer, BorderLayout.AFTER_LAST_LINE);
+		frame.add(chatContainer, BorderLayout.PAGE_START);
+		frame.add(progressBarContainer, BorderLayout.CENTER);
+		frame.add(sysMsgContainer, BorderLayout.PAGE_END);
 		frame.pack();
 		
 		frame.setVisible(true);
