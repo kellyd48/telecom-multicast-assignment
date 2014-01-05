@@ -9,9 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 public class SystemMessageContainer extends JPanel{
-	private final int WIDTH = Constants.SYSTEM_MSG_CONTAINER_WIDTH;
-	private final int HEIGHT = Constants.SYSTEN_MSG_CONTAINER_HEIGHT;
-	private final int PADDING = Constants.SYSTEN_MSG_CONTAINER_PADDING;
+	private final int WIDTH = 600;
+	private final int HEIGHT = 30;
+	private final int PADDING = 10;
 	private JLabel labelMsg;
 	private String strMsg;
 

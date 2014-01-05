@@ -5,8 +5,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Frame {
-	static final int WIDTH = 640;
-	static final int HEIGHT =640;
 
 	static public void createAndShowGUI(){
 		JFrame frame = new JFrame("Snapchat v1.0");
@@ -15,7 +13,7 @@ public class Frame {
 		ChatContainer chatContainer = new ChatContainer();
 		ProgressBarContainer progressBarContainer = new ProgressBarContainer();
 		SystemMessageContainer sysMsgContainer = new SystemMessageContainer("Waiting...");
-		ButtonsContainer buttonsContainer = new ButtonsContainer();
+		ButtonsContainer buttonsContainer = new ButtonsContainer(chatContainer);
 
 		GroupLayout layout = new GroupLayout(panel);
 		

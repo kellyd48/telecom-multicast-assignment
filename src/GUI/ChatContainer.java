@@ -12,13 +12,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class ChatContainer extends JPanel{
-	private final int WIDTH = Constants.CHAT_CONTAINER_WIDTH;
-	private final int HEIGHT = Constants.CHAT_CONTAINER_HEIGHT;
-	private final int PADDING = Constants.CHAT_CONTAINER_PADDING;
+	public static final int WIDTH = 500;
+	public static final int HEIGHT = 500;
+	public static final int PADDING = 20;
+	private ImageIcon image;
 	
 	public ChatContainer(){
 		this.setPreferredSize(new Dimension(WIDTH,HEIGHT));
-			ImageIcon image = createImageIcon("img/img.jpg","img.jpg");
+			 image = createImageIcon("img/img.jpg","img.jpg");
 			if(isImageTooBig(image)){
 				image = resizeImage(image);
 			}
@@ -78,4 +79,5 @@ public class ChatContainer extends JPanel{
         return iImage;
 	}
 	
+	public ImageIcon getImageIcon(){return image;}
 }

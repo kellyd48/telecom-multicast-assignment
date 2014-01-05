@@ -7,9 +7,9 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 public class ProgressBarContainer extends JPanel{
-	private final int WIDTH = Constants.PROGRESS_BAR_CONTAINER_WIDTH;
-	private final int HEIGHT = Constants.PROGRESS_BAR_CONTAINER_HEIGHT;
-	private final int PADDING = Constants.PROGRESS_BAR_CONTAINER_PADDING;
+	private final int WIDTH = 600;
+	private final int HEIGHT = 50;
+	private final int PADDING = 30;
 	
 	JProgressBar progressBar;
 	
