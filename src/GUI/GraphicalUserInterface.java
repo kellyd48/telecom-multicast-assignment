@@ -1,19 +1,38 @@
 package GUI;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class Frame {
+public class GraphicalUserInterface {
+	private ChatContainer chatContainer;
+	private ProgressBarContainer progressBarContainer;
+	private SystemMessageContainer sysMsgContainer;
+	private ButtonsContainer buttonsContainer;
+	
+	public GraphicalUserInterface(){
+		try {
+			javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
+			    public void run() {
+			        createAndShowGUI();
+			    }
+			});
+		} catch (InvocationTargetException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-	static public void createAndShowGUI(){
+	public void createAndShowGUI(){
 		JFrame frame = new JFrame("Snapchat v1.0");
 		JPanel panel = new JPanel();
 		
-		ChatContainer chatContainer = new ChatContainer();
-		ProgressBarContainer progressBarContainer = new ProgressBarContainer();
-		SystemMessageContainer sysMsgContainer = new SystemMessageContainer("Waiting...");
-		ButtonsContainer buttonsContainer = new ButtonsContainer(chatContainer);
+		chatContainer = new ChatContainer();
+		progressBarContainer = new ProgressBarContainer();
+		sysMsgContainer = new SystemMessageContainer("Waiting...");
+		buttonsContainer = new ButtonsContainer(chatContainer);
 
 		GroupLayout layout = new GroupLayout(panel);
 		
@@ -43,12 +62,13 @@ public class Frame {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
-	static public void main(String[] args){
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
+	void setMessage(String strMsg){
+		if(sysMsgContainer!=null)
+			sysMsgContainer.setMessage(strMsg);
 	}
-
+	
+	void clearMessage(){
+		if(sysMsgContainer!=null)
+			sysMsgContainer.clearMessage();
+	}
 }

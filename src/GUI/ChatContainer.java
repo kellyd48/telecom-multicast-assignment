@@ -15,6 +15,7 @@ public class ChatContainer extends JPanel{
 	public static final int WIDTH = 500;
 	public static final int HEIGHT = 500;
 	public static final int PADDING = 20;
+	private JLabel label;
 	private ImageIcon image;
 	
 	public ChatContainer(){
@@ -25,6 +26,10 @@ public class ChatContainer extends JPanel{
 			}
 			JLabel label = new JLabel("",image,JLabel.CENTER);
 			this.add(label);
+	}
+	
+	public void displayImage(ImageIcon srcImage){
+		image = srcImage;
 	}
 	
 	private ImageIcon createImageIcon(String path, String description) {
