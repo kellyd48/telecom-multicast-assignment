@@ -74,4 +74,10 @@ public class ReceiverBuffer {
 		return state == BUFFER_STATE.COMPLETE;
 	}
 	
+	/**
+	 * @return Returns progress as a percentage of the amount of bytes received.
+	 */
+	public int getPercentageProgress(){
+		return (dataReceivedSize / sizeOfData) * 100;
+	}
 }

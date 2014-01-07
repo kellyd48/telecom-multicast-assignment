@@ -89,6 +89,8 @@ public class Listening extends Transmission implements Runnable {
 							this.state.set(ClientState.State.JOIN_GROUP);
 						}
 					}
+					//update amount of progress
+					setProgress(r.getPercentageProgress());
 					break;
 				} // end IMAGE case
 				case ACK: {

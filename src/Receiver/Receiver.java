@@ -77,4 +77,11 @@ public class Receiver extends JPanel{
 	public RECEIVER_STATE getState(){
 		return state;
 	}
+	
+	/**
+	 * @return Returns progress as a percentage of the amount of bytes received.
+	 */
+	public int getPercentageProgress(){
+		return buffer.getPercentageProgress();
+	}
 }

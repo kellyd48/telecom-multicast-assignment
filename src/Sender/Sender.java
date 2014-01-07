@@ -140,4 +140,11 @@ public class Sender {
 	public SENDER_STATE getState(){
 		return state;
 	}
+
+	/**
+	 * @return Returns integer percentage progress of sending an image.
+	 */
+	public int getPercentageProgress(){
+		return (dataToSend.length / dataBytesSent) * 100;
+	}
 }

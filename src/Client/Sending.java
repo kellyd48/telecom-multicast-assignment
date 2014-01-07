@@ -82,6 +82,8 @@ public class Sending extends Transmission implements Runnable {
 						println("Resending");
 					}
 					runSender();
+					//update progress
+					setProgress(s.getPercentageProgress());
 					break;
 				} // end SENDING_IMAGE case
 				case RECEIVING_IMAGE:
