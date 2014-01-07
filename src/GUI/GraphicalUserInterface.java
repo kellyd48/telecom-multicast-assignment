@@ -104,7 +104,8 @@ public class GraphicalUserInterface {
 	 * @param progress
 	 */
 	public void setProgress(int progress){ 
-		progressBarContainer.setProgress(progress);
+		if(progressBarContainer != null)
+			progressBarContainer.setProgress(progress);
 	}
 	
 	public int getMaxProgress(){ 

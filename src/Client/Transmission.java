@@ -2,13 +2,15 @@ package Client;
 
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+
 import Client.Client.ClientState;
 import GUI.GraphicalUserInterface;
 
 public abstract class Transmission {
-	
+
 	public static enum CLIENT_STATE {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE, CLOSED};
-	
+	public static final int GUI_UPDATE_INTERVAL = 1000;
+
 	protected MulticastSocket mSocket;
 	protected InetAddress mAddress;
 	protected ClientState state;
@@ -16,8 +18,10 @@ public abstract class Transmission {
 	protected ClientNodeList senderNodeList;
 	protected Identifier ID;
 	private static int progress = 0;
+	//gui
 	private GraphicalUserInterface gui;
-	
+	private long lastTimeUpdated = 0;
+
 	/**
 	 * Transmission Constructor
 	 * @param mSocket
@@ -37,14 +41,14 @@ public abstract class Transmission {
 		this.ID = ID;
 		this.gui = gui;
 	} // end Transmission method
-	
+
 	/**
 	 * @return Returns the amount of progress.
 	 */
 	public int getProgress(){
 		return progress;
 	}
-	
+
 	/**
 	 * Sets the progress variable (should be a percentage.)
 	 * @param progress
@@ -54,13 +58,23 @@ public abstract class Transmission {
 	}
 
 	public synchronized void updateGUI(){
-		try {
-			Thread.sleep(20);
-			gui.setProgress(ClientState.getPercentageProgress(state, getProgress()));
-			gui.setMessage(ClientState.getProgressMessage(state));
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+		//Interval put in place to avoid some weird thread problems I don't understand.
+		long now = System.currentTimeMillis();
+		long timeSinceLastUpdate = now - lastTimeUpdated;
+		if(timeSinceLastUpdate >= GUI_UPDATE_INTERVAL){
+			try {
+				String msg = ClientState.getProgressMessage(state);
+				int progress = ClientState.getPercentageProgress(state, getProgress());
+				Thread.sleep(20);
+				gui.setProgress(progress);
+				Thread.sleep(20);
+				gui.setMessage(msg);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else{
+			lastTimeUpdated = now;
 		}
 	}
 } // end Transmission class

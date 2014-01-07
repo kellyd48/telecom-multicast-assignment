@@ -37,15 +37,21 @@ public class Sending extends Transmission implements Runnable {
 	 */
 	@Override
 	public void run() {
-		updateGUI();
 		long lastTime = 0;
 		while(!state.equals(ClientState.State.CLOSED)) {
+			//ouput
+			updateGUI();
 			switch(state.get()) {
 				case JOIN_GROUP: {
 					//sends hello packets
+					//ouput
+					updateGUI();
 					System.out.println("Sender state: "+state.toString());
+					//send hello packet
 					sendHello();
 					state.set(ClientState.State.LISTENING);
+					//ouput
+					updateGUI();
 					System.out.println("Sender state: " + state.toString());
 					lastTime = System.currentTimeMillis();
 					break;
@@ -57,6 +63,8 @@ public class Sending extends Transmission implements Runnable {
 						updateSenderNodeList();
 						runSender();
 						state.set(ClientState.State.SENDING_IMAGE);
+						//ouput
+						updateGUI();
 						System.out.println("Sender state: "+state.toString());
 					}
 					else{
@@ -70,6 +78,8 @@ public class Sending extends Transmission implements Runnable {
 				} // end LISTENING case
 				case SENDING_IMAGE: {
 					//sends next image packet
+					//ouput
+					updateGUI();
 					System.out.println("Sender state: "+state.toString());
 					if(senderNodeList.checkAllAcks(s.getSequence())){
 						if(s.getState() == Sender.SENDER_STATE.COMPLETED){

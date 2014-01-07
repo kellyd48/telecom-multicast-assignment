@@ -36,7 +36,6 @@ public class Listening extends Transmission implements Runnable {
 	 */
 	@Override
 	public void run() {
-		updateGUI();
 		try {
 			DatagramPacket p = null;
 			byte[] data= new byte[Multicast.MTU];  
@@ -46,6 +45,8 @@ public class Listening extends Transmission implements Runnable {
 				mSocket.receive(p);	
 				// process it
 				receivePacket(p);
+				//output
+				updateGUI();
 				System.out.println("State: (Listener)"+state.toString());
 			} // end while
 		}
