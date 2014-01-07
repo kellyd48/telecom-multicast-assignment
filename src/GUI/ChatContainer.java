@@ -21,11 +21,6 @@ public class ChatContainer extends JPanel{
 	
 	public ChatContainer(){
 		this.setPreferredSize(new Dimension(WIDTH,HEIGHT));
-		image = createImageIcon("imgs/img.jpg","img.jpg");
-		
-		if(isImageTooBig(image)){
-			image = resizeImage(image);
-		}
 		JLabel label = new JLabel();
 		label.setIcon(image);
 		this.add(label);
@@ -84,12 +79,14 @@ public class ChatContainer extends JPanel{
 	}
 	
 	public void displayImage(BufferedImage srcImg){
+		assert(srcImg != null);
 		image.setImage(srcImg);
 		if(isImageTooBig(image)){
 			image = resizeImage(image);
 		}
 		super.repaint();
 	}
+	
 	public void displayImage(ImageIcon srcImg){
 		if(isImageTooBig(srcImg)){
 			srcImg = resizeImage(srcImg);
@@ -98,5 +95,7 @@ public class ChatContainer extends JPanel{
 		super.repaint();
 	}
 	
-	public ImageIcon getImageIcon(){return image;}
+	public ImageIcon getImageIcon(){
+		return image;
+	}
 }

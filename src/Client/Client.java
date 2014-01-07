@@ -2,6 +2,7 @@ package Client;
 
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import GUI.GraphicalUserInterface;
 
 public class Client implements Runnable {
 
@@ -90,6 +91,7 @@ public class Client implements Runnable {
 	@SuppressWarnings("unused")
 	private ClientNodeList senderNodeList;
 	private Identifier ID;
+	private GraphicalUserInterface gui;
 
 	public static void main(String[] args) {
 		new Thread(new Client()).start();
@@ -103,6 +105,8 @@ public class Client implements Runnable {
 		ID = new Identifier();
 		state = new ClientState();
 		clientNodeList = new ClientNodeList(ID);
+		//create new gui
+		gui = new GraphicalUserInterface(ID.toString());
 		try {
 			mAddress = InetAddress.getByName(Multicast.MCAST_ADDR);
 			mSocket = new MulticastSocket(Multicast.MCAST_PORT);
@@ -120,9 +124,9 @@ public class Client implements Runnable {
 	public void run() {
 		// create and start send and listener threads
 		new Thread(new Sending(mSocket,mAddress, state, clientNodeList, 
-				clientNodeList, ID)).start();
+				clientNodeList, ID, gui)).start();
 		new Thread(new Listening(mSocket, mAddress, state, clientNodeList, 
-				clientNodeList, ID)).start();	
+				clientNodeList, ID, gui)).start();	
 	} // end run method
 
 } // end Client abstract class

@@ -26,6 +26,7 @@ public class ProgressBarContainer extends JPanel{
 	}
 	
 	public void setProgress(int n){
+		assert(n <= maxValue && n >= minValue);
 		progressBar.setValue(n);
 		progressBar.updateUI();
 	}

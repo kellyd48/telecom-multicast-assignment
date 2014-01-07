@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 import Client.Client.ClientState;
+import GUI.GraphicalUserInterface;
 import Sender.*;
 
 public class Sending extends Transmission implements Runnable {
@@ -22,11 +23,12 @@ public class Sending extends Transmission implements Runnable {
 	 * @param clientNodeList
 	 * @param senderNodeList
 	 * @param ID
+	 * @param gui
 	 */
 	public Sending (MulticastSocket mSocket, InetAddress mAddress,
 			ClientState state, ClientNodeList clientNodeList,
-			ClientNodeList senderNodeList, Identifier ID) {
-		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID);
+			ClientNodeList senderNodeList, Identifier ID, GraphicalUserInterface gui) {
+		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, gui);
 		this.s = new Sender(ID);
 	} // end Sending constructor
 
@@ -35,6 +37,7 @@ public class Sending extends Transmission implements Runnable {
 	 */
 	@Override
 	public void run() {
+		updateGUI();
 		long lastTime = 0;
 		while(!state.equals(ClientState.State.CLOSED)) {
 			switch(state.get()) {

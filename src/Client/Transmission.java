@@ -1,9 +1,9 @@
 package Client;
+
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import GUI.GraphicalUserInterface;
-
 import Client.Client.ClientState;
+import GUI.GraphicalUserInterface;
 
 public abstract class Transmission {
 	
@@ -16,7 +16,6 @@ public abstract class Transmission {
 	protected ClientNodeList senderNodeList;
 	protected Identifier ID;
 	private static int progress = 0;
-	//gui
 	private GraphicalUserInterface gui;
 	
 	/**
@@ -29,15 +28,14 @@ public abstract class Transmission {
 	 * @param ID
 	 */
 	public Transmission(MulticastSocket mSocket, InetAddress mAddress, ClientState state,
-			ClientNodeList clientNodeList, ClientNodeList senderNodeList, Identifier ID) {
+			ClientNodeList clientNodeList, ClientNodeList senderNodeList, Identifier ID, GraphicalUserInterface gui) {
 		this.mSocket = mSocket;
 		this.mAddress = mAddress;
 		this.state = state;
 		this.clientNodeList = clientNodeList;
 		this.senderNodeList = senderNodeList;
 		this.ID = ID;
-		//gui
-		gui = new GraphicalUserInterface(ID.toString());
+		this.gui = gui;
 	} // end Transmission method
 	
 	/**
@@ -56,22 +54,13 @@ public abstract class Transmission {
 	}
 
 	public synchronized void updateGUI(){
-		gui.setProgress(ClientState.getPercentageProgress(state, getProgress()));
-		gui.setMessage(ClientState.getProgressMessage(state));
-	}
-	
-	/**
-	 * Prints a message to the terminal
-	 * 20 millisecond sleep, to allow threads to print to terminal properly
-	 * @param message
-	 */
-	public synchronized void println(String message) {
 		try {
 			Thread.sleep(20);
-			//terminal.println(message);
+			gui.setProgress(ClientState.getPercentageProgress(state, getProgress()));
+			gui.setMessage(ClientState.getProgressMessage(state));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-	} // end println method
+	}
 } // end Transmission class

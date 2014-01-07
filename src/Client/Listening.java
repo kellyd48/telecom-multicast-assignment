@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 import Client.Client.ClientState;
+import GUI.GraphicalUserInterface;
 import Receiver.*;
 
 public class Listening extends Transmission implements Runnable {
@@ -21,12 +22,12 @@ public class Listening extends Transmission implements Runnable {
 	 * @param clientNodeList
 	 * @param senderNodeList
 	 * @param ID
-	 * @param terminal
+	 * @param gui
 	 */
 	public Listening(MulticastSocket mSocket, InetAddress mAddress,
 			ClientState state, ClientNodeList clientNodeList,
-			ClientNodeList senderNodeList, Identifier ID) {
-		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID);
+			ClientNodeList senderNodeList, Identifier ID, GraphicalUserInterface gui) {
+		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, gui);
 		this.r = new Receiver(ID);
 	} // end Listening constructor
 
@@ -35,6 +36,7 @@ public class Listening extends Transmission implements Runnable {
 	 */
 	@Override
 	public void run() {
+		updateGUI();
 		try {
 			DatagramPacket p = null;
 			byte[] data= new byte[Multicast.MTU];  
