@@ -8,7 +8,6 @@ import java.net.MulticastSocket;
 
 import Client.Client.ClientState;
 import Sender.*;
-import tcdIO.*;
 
 public class Sending extends Transmission implements Runnable {
 
@@ -23,13 +22,11 @@ public class Sending extends Transmission implements Runnable {
 	 * @param clientNodeList
 	 * @param senderNodeList
 	 * @param ID
-	 * @param terminal
-	 * @param testingSenderFile
 	 */
 	public Sending (MulticastSocket mSocket, InetAddress mAddress,
 			ClientState state, ClientNodeList clientNodeList,
-			ClientNodeList senderNodeList, Identifier ID, Terminal terminal) {
-		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, terminal);
+			ClientNodeList senderNodeList, Identifier ID) {
+		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID);
 		this.s = new Sender(ID);
 	} // end Sending constructor
 
@@ -43,10 +40,10 @@ public class Sending extends Transmission implements Runnable {
 			switch(state.get()) {
 				case JOIN_GROUP: {
 					//sends hello packets
-					println("Sender state: "+state.toString());
+					System.out.println("Sender state: "+state.toString());
 					sendHello();
 					state.set(ClientState.State.LISTENING);
-					println("Sender state: " + state.toString());
+					System.out.println("Sender state: " + state.toString());
 					lastTime = System.currentTimeMillis();
 					break;
 				} // end JOIN_GROUP case
@@ -57,29 +54,29 @@ public class Sending extends Transmission implements Runnable {
 						updateSenderNodeList();
 						runSender();
 						state.set(ClientState.State.SENDING_IMAGE);
-						println("Sender state: "+state.toString());
+						System.out.println("Sender state: "+state.toString());
 					}
 					else{
 						long now = System.currentTimeMillis();
 						if(now - lastTime >= Multicast.HELLO_TIME_INTERVAL){
 							this.state.set(ClientState.State.JOIN_GROUP);
-							println("Hello message time interval reached.");
+							System.out.println("Hello message time interval reached.");
 						}
 					}
 					break;
 				} // end LISTENING case
 				case SENDING_IMAGE: {
 					//sends next image packet
-					println("Sender state: "+state.toString());
+					System.out.println("Sender state: "+state.toString());
 					if(senderNodeList.checkAllAcks(s.getSequence())){
 						if(s.getState() == Sender.SENDER_STATE.COMPLETED){
 							this.state.set(ClientState.State.JOIN_GROUP);
 						}else{
-							println("Sending");
+							System.out.println("Sending");
 						}
 					}else{
 						s.resend();
-						println("Resending");
+						System.out.println("Resending");
 					}
 					runSender();
 					//update progress
@@ -130,7 +127,7 @@ public class Sending extends Transmission implements Runnable {
 			packet = new DatagramPacket(helloPacket, helloPacket.length, mAddress, Multicast.MCAST_PORT);
 			for(int i = 0; i < Multicast.NUMBER_OF_PACKETS_PER_HELLO; i++) {
 				mSocket.send(packet);
-				println("Sent Hello Packet.");
+				System.out.println("Sent Hello Packet.");
 				Thread.sleep(Multicast.HELLO_PACKET_TIME_INTERVAL);
 			}
 		} 
@@ -150,7 +147,7 @@ public class Sending extends Transmission implements Runnable {
 				byte[] packetData = s.packetToSend();
 				packet = new DatagramPacket(packetData, packetData.length, mAddress, Multicast.MCAST_PORT);
 				mSocket.send(packet);
-				println("Sent packet from Sender.");
+				System.out.println("Sent packet from Sender.");
 			}	
 		}
 		catch (IOException e) {

@@ -7,7 +7,6 @@ import java.net.MulticastSocket;
 
 import Client.Client.ClientState;
 import Receiver.*;
-import tcdIO.*;
 
 public class Listening extends Transmission implements Runnable {
 
@@ -26,8 +25,8 @@ public class Listening extends Transmission implements Runnable {
 	 */
 	public Listening(MulticastSocket mSocket, InetAddress mAddress,
 			ClientState state, ClientNodeList clientNodeList,
-			ClientNodeList senderNodeList, Identifier ID, Terminal terminal) {
-		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID, terminal);
+			ClientNodeList senderNodeList, Identifier ID) {
+		super(mSocket, mAddress, state, clientNodeList, senderNodeList, ID);
 		this.r = new Receiver(ID);
 	} // end Listening constructor
 
@@ -45,7 +44,7 @@ public class Listening extends Transmission implements Runnable {
 				mSocket.receive(p);	
 				// process it
 				receivePacket(p);
-				println("State: (Listener)"+state.toString());
+				System.out.println("State: (Listener)"+state.toString());
 			} // end while
 		}
 		catch(IOException e) {
@@ -68,12 +67,12 @@ public class Listening extends Transmission implements Runnable {
 				case HELLO: {
 					ClientNode node = new ClientNode(mAddress, identifier);
 					clientNodeList.add(node);
-					println("Received Hello Packet from " +identifier.toString() + " " +p.getAddress());
+					System.out.println("Received Hello Packet from " +identifier.toString() + " " +p.getAddress());
 					break;
 				} // end HELLO case
 				case IMAGE_METADATA: {
 					if(!state.equals(ClientState.State.RECEIVING_IMAGE) && receivingFrom == null){
-						println("Received Metadata for Image");
+						System.out.println("Received Metadata for Image");
 						receivingFrom = new Identifier(identifier);
 						state.set(ClientState.State.RECEIVING_IMAGE);
 					}
@@ -81,7 +80,7 @@ public class Listening extends Transmission implements Runnable {
 				case IMAGE: {
 					// Checks that the packet originated from the expected sender.
 					if(receivingFrom != null && identifier.equals(receivingFrom)){
-						println("Received Image Packet");
+						System.out.println("Received Image Packet");
 						r.run(packetData);
 						sendAckResponse(Ack.nextExpectedAck(r.getAck()));
 						if(r.getState() == Receiver.RECEIVER_STATE.FINISHED_RECEIVING){
@@ -94,11 +93,11 @@ public class Listening extends Transmission implements Runnable {
 					break;
 				} // end IMAGE case
 				case ACK: {
-					println("Received Ack Packet.");
+					System.out.println("Received Ack Packet.");
 					if(state.equals(ClientState.State.SENDING_IMAGE)){
 						senderNodeList.updateAck(Multicast.getClientIdentifier(packetData), 
 								new Ack(Multicast.getHeaderData(packetData)));
-						println(senderNodeList.toString());
+						System.out.println(senderNodeList.toString());
 					}	
 					break;
 				} // end ACK case
@@ -123,7 +122,7 @@ public class Listening extends Transmission implements Runnable {
 		try {
 			DatagramPacket packet = new DatagramPacket(data, Multicast.MTU, mAddress, Multicast.MCAST_PORT);
 			mSocket.send(packet);
-			println("Sent ack ("+ackToSend.toString()+")");
+			System.out.println("Sent ack ("+ackToSend.toString()+")");
 		} 
 		catch (Exception e) {
 			e.printStackTrace();

@@ -3,8 +3,6 @@ package Client;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-import tcdIO.*;
-
 public class Client implements Runnable {
 
 	public static final String IMAGE_FILENAME = "image.jpg";
@@ -46,8 +44,7 @@ public class Client implements Runnable {
 		 * @param transmission
 		 * @return Returns progress as a percentage based on the current state of the program.
 		 */
-		 public static int getPercentageProgress(ClientState state, Transmission transmission){
-			int progress = transmission.getProgress();
+		 public static int getPercentageProgress(ClientState state, int imageProgress){
 			switch(state.get()){
 				case JOIN_GROUP:
 					return 20;
@@ -55,7 +52,7 @@ public class Client implements Runnable {
 					return 40;
 				case SENDING_IMAGE:
 				case RECEIVING_IMAGE:
-					return progress;
+					return imageProgress;
 				case CLOSED:
 					return 100;
 				default:
@@ -68,7 +65,7 @@ public class Client implements Runnable {
 		  * @param transmission
 		  * @return Returns a String indicating the current progress of the program.
 		  */
-		 public static String getProgressMessage(ClientState state, Transmission transmission){
+		 public static String getProgressMessage(ClientState state){
 			 switch(state.get()){
 				 case JOIN_GROUP:
 					 return "Joining local Snapchat group...";
@@ -93,7 +90,6 @@ public class Client implements Runnable {
 	@SuppressWarnings("unused")
 	private ClientNodeList senderNodeList;
 	private Identifier ID;
-	private Terminal terminal;
 
 	public static void main(String[] args) {
 		new Thread(new Client()).start();
@@ -106,8 +102,7 @@ public class Client implements Runnable {
 	public Client() {
 		ID = new Identifier();
 		state = new ClientState();
-		terminal = new Terminal("Client ID: " + ID.toString());
-		clientNodeList = new ClientNodeList(ID,terminal);
+		clientNodeList = new ClientNodeList(ID);
 		try {
 			mAddress = InetAddress.getByName(Multicast.MCAST_ADDR);
 			mSocket = new MulticastSocket(Multicast.MCAST_PORT);
@@ -125,9 +120,9 @@ public class Client implements Runnable {
 	public void run() {
 		// create and start send and listener threads
 		new Thread(new Sending(mSocket,mAddress, state, clientNodeList, 
-				clientNodeList, ID, terminal)).start();
+				clientNodeList, ID)).start();
 		new Thread(new Listening(mSocket, mAddress, state, clientNodeList, 
-				clientNodeList, ID, terminal)).start();	
+				clientNodeList, ID)).start();	
 	} // end run method
 
 } // end Client abstract class
