@@ -16,6 +16,7 @@ public abstract class Transmission {
 	protected ClientNodeList senderNodeList;
 	protected Identifier ID;
 	private Terminal terminal;
+	private int progress;
 	
 	/**
 	 * Transmission Constructor
@@ -36,7 +37,15 @@ public abstract class Transmission {
 		this.senderNodeList = senderNodeList;
 		this.ID = ID;
 		this.terminal = terminal;
+		this.progress = 0;
 	} // end Transmission method
+	
+	/**
+	 * @return Returns the amount of progress.
+	 */
+	public int getProgress(){
+		return progress;
+	}
 	
 	/**
 	 * Prints a message to the terminal

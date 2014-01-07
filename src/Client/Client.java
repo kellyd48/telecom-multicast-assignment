@@ -6,41 +6,85 @@ import java.net.MulticastSocket;
 import tcdIO.*;
 
 public class Client implements Runnable {
-	
+
 	public static final String IMAGE_FILENAME = "image.jpg";
-	
+
 	/**
-     * Class to represent the state of the client.
-     *
-     */
-    public static class ClientState{
-            public enum State {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE, CLOSED};
-            public State state;
-            
-            public ClientState(){
-                    this(State.JOIN_GROUP);
-            }
-            
-            public ClientState(State state){
-                    this.state = state;
-            }
-            
-            public boolean equals(State state){
-                    return (this.state == state);
-            }
-            
-            public State get(){
-                    return state;
-            }
-            
-            public void set(State state){
-                    this.state = state;
-            }
-    
-            public String toString(){
-             return state.toString();        
-            }
-    }
+	 * Class to represent the state of the client.
+	 *
+	 */
+	public static class ClientState{
+		public enum State {JOIN_GROUP, LISTENING, SENDING_IMAGE, RECEIVING_IMAGE, CLOSED};
+		public State state;
+
+		public ClientState(){
+			this(State.JOIN_GROUP);
+		}
+
+		public ClientState(State state){
+			this.state = state;
+		}
+
+		public boolean equals(State state){
+			return (this.state == state);
+		}
+
+		public State get(){
+			return state;
+		}
+
+		public void set(State state){
+			this.state = state;
+		}
+
+		public String toString(){
+			return state.toString();        
+		}
+
+		/**
+		 * @param state
+		 * @param transmission
+		 * @return Returns progress as a percentage based on the current state of the program.
+		 */
+		 public static int getPercentageProgress(ClientState state, Transmission transmission){
+			int progress = transmission.getProgress();
+			switch(state.get()){
+				case JOIN_GROUP:
+					return 20;
+				case LISTENING:
+					return 40;
+				case SENDING_IMAGE:
+				case RECEIVING_IMAGE:
+					return progress;
+				case CLOSED:
+					return 100;
+				default:
+					return 0;
+			}
+		 }
+
+		 /**
+		  * @param state
+		  * @param transmission
+		  * @return Returns a String indicating the current progress of the program.
+		  */
+		 public static String getProgressMessage(ClientState state, Transmission transmission){
+			 switch(state.get()){
+				 case JOIN_GROUP:
+					 return "Joining local Snapchat group...";
+				 case LISTENING:
+					 return "Listening for other snapchat users...";
+				 case SENDING_IMAGE:
+					 return "Sending Image";
+				 case RECEIVING_IMAGE:
+					 return "Receiving Image";
+				 case CLOSED:
+					 return "Closed";
+				 default:
+					 return "";
+			 }
+		 }
+	}
 
 	private MulticastSocket mSocket;
 	private InetAddress mAddress;
@@ -50,11 +94,11 @@ public class Client implements Runnable {
 	private ClientNodeList senderNodeList;
 	private Identifier ID;
 	private Terminal terminal;
-	
+
 	public static void main(String[] args) {
 		new Thread(new Client()).start();
 	}
-	
+
 	/**
 	 * Client Constructor
 	 * @param testingSenderFile
