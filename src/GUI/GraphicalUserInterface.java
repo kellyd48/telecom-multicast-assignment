@@ -1,8 +1,10 @@
 package GUI;
 
+import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -11,8 +13,12 @@ public class GraphicalUserInterface {
 	private ProgressBarContainer progressBarContainer;
 	private SystemMessageContainer sysMsgContainer;
 	private ButtonsContainer buttonsContainer;
+	private int progressMinValue, progressMaxValue;
 	
-	public GraphicalUserInterface(){
+	public GraphicalUserInterface(int progressMinValue, int progressMaxValue){
+		this.progressMinValue=progressMinValue;
+		this.progressMaxValue=progressMaxValue;
+		
 		try {
 			javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
 			    public void run() {
@@ -25,12 +31,12 @@ public class GraphicalUserInterface {
 		}
 	}
 
-	public void createAndShowGUI(){
+	private void createAndShowGUI(){
 		JFrame frame = new JFrame("Snapchat v1.0");
 		JPanel panel = new JPanel();
 		
 		chatContainer = new ChatContainer();
-		progressBarContainer = new ProgressBarContainer();
+		progressBarContainer = new ProgressBarContainer(this.progressMinValue, this.progressMaxValue);
 		sysMsgContainer = new SystemMessageContainer("Waiting...");
 		buttonsContainer = new ButtonsContainer(chatContainer);
 
@@ -62,13 +68,20 @@ public class GraphicalUserInterface {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
-	void setMessage(String strMsg){
+	public void setMessage(String strMsg){
 		if(sysMsgContainer!=null)
 			sysMsgContainer.setMessage(strMsg);
 	}
-	
-	void clearMessage(){
+	public void clearMessage(){
 		if(sysMsgContainer!=null)
 			sysMsgContainer.clearMessage();
 	}
+	
+	public void displayImage(BufferedImage srcImg){ chatContainer.displayImage(srcImg);}
+	public void displayImage(ImageIcon srcImg){ chatContainer.displayImage(srcImg);}
+	public ImageIcon createImageIcon(String path, String description){ return chatContainer.createImageIcon(path, description);}
+	
+	public void setProgress(int progress){ progressBarContainer.setProgress(progress);}
+	public int getMaxProgress(){ return progressBarContainer.getMaxValue();}
+	public int getMinProgress(){ return progressBarContainer.getMinValue();}
 }

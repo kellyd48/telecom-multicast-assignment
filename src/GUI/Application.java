@@ -1,14 +1,15 @@
 package GUI;
 
-public class Application {
-
-	public static void main(String[] args) {
-		GraphicalUserInterface gui = new GraphicalUserInterface();
-		int i =0;
-		while(i<Integer.MAX_VALUE){
-			gui.setMessage(Integer.toString(i));
-			i++;
+public class Application{
+	
+	public static void main(String[] args){
+		GraphicalUserInterface gui = new GraphicalUserInterface(0,100);
+		try {
+			Thread.sleep(3000);
+			gui.displayImage(gui.createImageIcon("imgs/jacob.jpg", "jacob"));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-
 }

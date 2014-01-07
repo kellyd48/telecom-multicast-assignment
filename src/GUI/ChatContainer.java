@@ -1,6 +1,7 @@
 package GUI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -20,19 +21,17 @@ public class ChatContainer extends JPanel{
 	
 	public ChatContainer(){
 		this.setPreferredSize(new Dimension(WIDTH,HEIGHT));
-			 image = createImageIcon("img/img.jpg","img.jpg");
-			if(isImageTooBig(image)){
-				image = resizeImage(image);
-			}
-			JLabel label = new JLabel("",image,JLabel.CENTER);
-			this.add(label);
+		image = createImageIcon("imgs/img.jpg","img.jpg");
+		
+		if(isImageTooBig(image)){
+			image = resizeImage(image);
+		}
+		JLabel label = new JLabel();
+		label.setIcon(image);
+		this.add(label);
 	}
 	
-	public void displayImage(ImageIcon srcImage){
-		image = srcImage;
-	}
-	
-	private ImageIcon createImageIcon(String path, String description) {
+	public ImageIcon createImageIcon(String path, String description) {
 		java.net.URL imgURL = getClass().getResource(path);
 		
 		if (imgURL != null) {
@@ -82,6 +81,21 @@ public class ChatContainer extends JPanel{
         iImage =new ImageIcon(resizedImg);
 	        
         return iImage;
+	}
+	
+	public void displayImage(BufferedImage srcImg){
+		image.setImage(srcImg);
+		if(isImageTooBig(image)){
+			image = resizeImage(image);
+		}
+		super.repaint();
+	}
+	public void displayImage(ImageIcon srcImg){
+		if(isImageTooBig(srcImg)){
+			srcImg = resizeImage(srcImg);
+		}
+		image.setImage(srcImg.getImage());
+		super.repaint();
 	}
 	
 	public ImageIcon getImageIcon(){return image;}
