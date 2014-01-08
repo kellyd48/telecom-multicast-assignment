@@ -56,6 +56,10 @@ public abstract class Transmission {
 	public synchronized void setProgress(int progress){
 		Transmission.progress = progress;
 	}
+	
+	public synchronized String getImageToSend(){
+		
+	}
 
 	public synchronized void updateGUI(){
 		//Interval put in place to avoid some weird thread problems I don't understand.

@@ -7,6 +7,7 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -30,13 +31,11 @@ public class ChatContainer extends JPanel{
 		this.add(label);
 	}
 	
-	public ImageIcon createImageIcon(String path, String description) {
-		java.net.URL imgURL = getClass().getResource(path);
-		
-		if (imgURL != null) {
-			return new ImageIcon(imgURL, description);
+	public ImageIcon createImageIcon(URL urlForSharedImage, String description) {
+		if (urlForSharedImage != null) {
+			return new ImageIcon(urlForSharedImage, description);
 		} else {
-			System.err.println("Couldn't find file: "+ getClass().getResource("").getPath() + path );
+			System.err.println("Couldn't find file: " + urlForSharedImage.toString());
 			return null;
 		}
 	}

@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -21,7 +23,8 @@ public class ButtonsContainer extends JPanel{
 	private ChatContainer chatContainer;
 	private JButton saveButton, shareButton;
 	private JFileChooser shareDialog, saveDialog;
-	private String shareFilePath, saveFilePath;
+	private String saveFilePath;
+	private URL urlForSharedImage;
 	private ImageIcon sharedImage;
 	
 	public ButtonsContainer( GraphicalUserInterface graphicalUserInterface,ChatContainer cc) {
@@ -72,9 +75,15 @@ public class ButtonsContainer extends JPanel{
 				
 				if(returnValue==JFileChooser.APPROVE_OPTION){
 					File file = shareDialog.getSelectedFile();
-					shareFilePath = file.getAbsolutePath();
+					try {
+						urlForSharedImage = file.toURI().toURL();
+					} catch (MalformedURLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					System.out.println("FilePath:"+urlForSharedImage.toString());
 					gui.setState(GraphicalUserInterface.IMAGE_SHARED);
-					sharedImage = chatContainer.createImageIcon(shareFilePath, "");
+					sharedImage = chatContainer.createImageIcon(urlForSharedImage, "");
 				}
 			}
 		});
