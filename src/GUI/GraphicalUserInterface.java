@@ -9,30 +9,35 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class GraphicalUserInterface {
-	public static final int PROGRESS_MIN_VALUE = 0;
-	public static final int PROGRESS_MAX_VALUE = 100;
-	public static final String WINDOW_TITLE = "Snapchat V1.0";
-	
 	private ChatContainer chatContainer;
 	private ProgressBarContainer progressBarContainer;
 	private SystemMessageContainer sysMsgContainer;
 	private ButtonsContainer buttonsContainer;
 	private int progressMinValue, progressMaxValue;
-	private String clientID = "";
-
-	public GraphicalUserInterface(String clientID){
-		this(PROGRESS_MIN_VALUE, PROGRESS_MAX_VALUE, clientID);
-	}
+	private int state;
+	public static final int DEFAULT_STATE = 0;
+	public static final int IMAGE_SHARED = 1;
 	
-	public GraphicalUserInterface(int progressMinValue, int progressMaxValue, String clientID){
+	
+	/**
+	 * Constructor creates the JFrame with 4 JLabels in it. One is used for displaying an image(ChatContainer),
+	 * one contains progress bar, another one contains system message and the last one contains save and share buttons.
+	 * It also sets the state of the GUI to its default state.
+	 * @param	progressMinValue	this is the minimum progress value of the JProgressBar that gets created here.
+	 * @param	progressMaxValue	this is the maximum progress value of the JProgressBar that gets created here.
+	 */
+	public GraphicalUserInterface(int progressMinValue, int progressMaxValue){
+		//default value
+		state = 0;
+		
 		this.progressMinValue=progressMinValue;
 		this.progressMaxValue=progressMaxValue;
-		this.clientID = clientID;
+		
 		try {
 			javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
-				public void run() {
-					createAndShowGUI();
-				}
+			    public void run() {
+			        createAndShowGUI();
+			    }
 			});
 		} catch (InvocationTargetException | InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -41,78 +46,117 @@ public class GraphicalUserInterface {
 	}
 
 	private void createAndShowGUI(){
-		JFrame frame = new JFrame(WINDOW_TITLE + " - Client ID:" + clientID);
+		JFrame frame = new JFrame("Snapchat v1.0");
 		JPanel panel = new JPanel();
-
+		
 		chatContainer = new ChatContainer();
 		progressBarContainer = new ProgressBarContainer(this.progressMinValue, this.progressMaxValue);
 		sysMsgContainer = new SystemMessageContainer("Waiting...");
-		buttonsContainer = new ButtonsContainer(chatContainer);
+		buttonsContainer = new ButtonsContainer(this, chatContainer);
 
 		GroupLayout layout = new GroupLayout(panel);
-
+		
 		GroupLayout.SequentialGroup horizontal = layout.createSequentialGroup();
 		horizontal.addGroup(layout.createParallelGroup()
 				.addComponent(chatContainer)
 				.addComponent(progressBarContainer)
 				.addComponent(sysMsgContainer)
 				.addComponent(buttonsContainer));
-
-		GroupLayout.SequentialGroup vertical = layout.createSequentialGroup();
-		vertical.addComponent(chatContainer);
-		vertical.addComponent(progressBarContainer);
-		vertical.addComponent(sysMsgContainer);
-		vertical.addComponent(buttonsContainer);
-
+		
+		 GroupLayout.SequentialGroup vertical = layout.createSequentialGroup();
+		 vertical.addComponent(chatContainer);
+		 vertical.addComponent(progressBarContainer);
+		 vertical.addComponent(sysMsgContainer);
+		 vertical.addComponent(buttonsContainer);
+		
 		layout.setHorizontalGroup(horizontal);
 		layout.setVerticalGroup(vertical);
-
+		
 		panel.setLayout(layout);
-
+		
 		frame.add(panel);
 		frame.pack();
-
+		
 		frame.setResizable(true);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-
+	
+	/**
+	 * Sets the system message to be displayed one at a time to update the user with what is
+	 * happening backstage at any given moment.
+	 * @param	strMsg	Message to be displayed.
+	 * */
 	public void setMessage(String strMsg){
 		if(sysMsgContainer!=null)
 			sysMsgContainer.setMessage(strMsg);
 	}
-	
+	/**
+	 * Clears the system message to display nothing. It is not necessary to clear the message before setting a new message,
+	 * you can just use the setMessage on its own to do this. 
+	 * */
 	public void clearMessage(){
 		if(sysMsgContainer!=null)
 			sysMsgContainer.clearMessage();
 	}
-
-	public void displayImage(BufferedImage srcImg){ 
-		chatContainer.displayImage(srcImg);
-	}
-
-	public void displayImage(ImageIcon srcImg){ 
-		chatContainer.displayImage(srcImg);
-	}
-
-	public ImageIcon createImageIcon(String path, String description){ 
-		return chatContainer.createImageIcon(path, description);
-	}
-
+	
 	/**
-	 * Progress should be passed as an integer percentage of the progress completed ie (0 >= progress <= 100)
-	 * @param progress
-	 */
-	public void setProgress(int progress){ 
-		if(progressBarContainer != null)
-			progressBarContainer.setProgress(progress);
-	}
+	 * Displays the image in the GUI when provided a valid BufferedImage in the parameter list.
+	 * @param	srcImg	the source image is the image of type BufferedImage that will be displayed when the method is ran.
+	 * */
+	public void displayImage(BufferedImage srcImg){ chatContainer.displayImage(srcImg);}
+	/**
+	 * Displays the image in the GUI when provided a valid ImageIcon in the parameter list.
+	 * @param	srcImg	the source image is the image of type ImageIcon that will be displayed when the method is ran.
+	 * */
+	public void displayImage(ImageIcon srcImg){ chatContainer.displayImage(srcImg);}
+	/** Clears the image from the GUI so an empty JLabel is displayed.*/
+	public void clearImage(){}
+	/**
+	 * Creates ImageIcon provided a valid path and some kind of description of the image.
+	 * @param	path	absolute or relative file path needs to be provided.
+	 * @param	description	brief description of an image, can be left blank by providing an empty string(eg.:"")
+	 * @return	ImageIcon	returns an ImageIcon type image from a path provided as a parameter and containing specified the descripition.
+	 * */
+	public ImageIcon createImageIcon(String path, String description){ return chatContainer.createImageIcon(path, description);}
 	
-	public int getMaxProgress(){ 
-		return progressBarContainer.getMaxValue();
-	}
+	/**
+	 * Possible states include:
+	 * <ul>
+	 * <li>DEFAULT_STATE, </li>
+	 * <li>IMAGE_SHARED</li>
+	 * </ul>
+	 * @return	the current state of the GUI. 
+	 * */
+	public int getState(){ return state;}
+	/**
+	 * When there is no action from user the state is set to DEFAULT_STATE and after the user takes some action the state
+	 * is set to particular state and after the task initiated by the user is performed the state must be reset to DEFAULT_STATE.
+	 * <p>
+	 * Example: when user shares some picture the state is set to IMAGE_SHARED and so an adequate check statement
+	 * should be implemented in the logic to check for the current state and then the image should be sent to the
+	 * multicast-group and the state should be reset to DEFAULT_STATE.
+	 * */
+	public void setState(int state){ this.state = state;}
 	
-	public int getMinProgress(){ 
-		return progressBarContainer.getMinValue();
-	}
+	/**
+	 * Sets progress of the progress bar to a given value. 
+	 * @param	progress	The progress value has to be in the range: minValue <= progress <= maxValue .
+	 * */
+	public void setProgress(int progress){ progressBarContainer.setProgress(progress);}
+	/**
+	 * @return int	Returns the maximum progress value of the progress bar that was originally set in the constructor.
+	 * */
+	public int getMaxProgress(){ return progressBarContainer.getMaxValue();}
+	/**
+	 * @return int	Returns the minimum progress value of the progress bar that was originally set in the constructor.
+	 * */
+	public int getMinProgress(){ return progressBarContainer.getMinValue();}
+	
+	/**
+	 * Returns the image that the user wishes to share. After image has been used to send it over the state should be reset
+	 * to DEFAULT_STATE.
+	 * @return	ImageIcon	returns the shared image.
+	 * */
+	public ImageIcon getSharedImage(){ return buttonsContainer.getSharedImage();}
 }

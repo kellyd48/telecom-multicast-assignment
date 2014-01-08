@@ -17,13 +17,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ButtonsContainer extends JPanel{
 	private ButtonsContainer self;
+	private GraphicalUserInterface gui;
 	private ChatContainer chatContainer;
 	private JButton saveButton, shareButton;
 	private JFileChooser shareDialog, saveDialog;
 	private String shareFilePath, saveFilePath;
-
-	public ButtonsContainer(ChatContainer cc) {
+	private ImageIcon sharedImage;
+	
+	public ButtonsContainer( GraphicalUserInterface graphicalUserInterface,ChatContainer cc) {
 		self = this;
+		this.gui = graphicalUserInterface;
 		this.chatContainer = cc;
 		
 		shareDialog = new JFileChooser();
@@ -70,7 +73,8 @@ public class ButtonsContainer extends JPanel{
 				if(returnValue==JFileChooser.APPROVE_OPTION){
 					File file = shareDialog.getSelectedFile();
 					shareFilePath = file.getAbsolutePath();
-					System.out.println(shareFilePath);
+					gui.setState(GraphicalUserInterface.IMAGE_SHARED);
+					sharedImage = chatContainer.createImageIcon(shareFilePath, "");
 				}
 			}
 		});
@@ -78,5 +82,5 @@ public class ButtonsContainer extends JPanel{
 		this.add(shareButton);
 	}
 	
-	
+	public ImageIcon getSharedImage(){ return sharedImage;}
 }

@@ -8,7 +8,7 @@ public class guiTestApp {
 	public GraphicalUserInterface gui;
 
 	public guiTestApp(){
-		gui = new GraphicalUserInterface("blank id");
+		gui = new GraphicalUserInterface(0,100);
 	}
 	
 	public static void main(String[] args){
