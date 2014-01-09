@@ -11,11 +11,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class GraphicalUserInterface {
+	/*STATES*/
+	public static final int DEFAULT_STATE = 0;
+	public static final int IMAGE_SHARED_STATE = 1;
+	/*------*/
+	
 	public static final String WINDOW_TITLE = "Snapchat v1.0";
 	public static final int DEFAULT_MIN_PROGRESS_VALUE = 0;
 	public static final int DEFAULT_MAX_PROGRESS_VALUE = 100;
-	public static final int DEFAULT_STATE = 0;
-	public static final int IMAGE_SHARED = 1;
 	
 	private ChatContainer chatContainer;
 	private ProgressBarContainer progressBarContainer;

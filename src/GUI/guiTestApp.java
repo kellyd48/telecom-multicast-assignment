@@ -33,10 +33,15 @@ public class guiTestApp {
 	}
 	
 	public void getImage(){
-		if(gui.getState()==gui.IMAGE_SHARED){
-			ImageIcon image = gui.getSharedImage();
-			System.out.println(image.getIconWidth()+"x"+image.getIconHeight());
-			gui.displayImage(image);
+		ImageIcon imageShared = gui.getSharedImage();
+		
+		if(gui.getState() == gui.IMAGE_SHARED_STATE){
+			gui.displayImage(imageShared);
+			
+			/* REMEMBER TO ALWAYS RESET IT TO DEFAULT STATE WHEN
+			 * YOU ARE FINISHED WORKING WITH IT
+			 * */
+			gui.setState(gui.DEFAULT_STATE);
 		}else{
 			System.out.println("No valid image....");
 		}
