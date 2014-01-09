@@ -1,0 +1,76 @@
+% To insert java code:
+% \lstinputlisting[label=Java code,caption=Java Code]{code.java}
+% To insert and image:
+% \includegraphics{image.png}
+
+\documentclass[11pt]{article}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{pifont}
+\newcommand{\tick}{\ding{52}}
+
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{lipsum}
+\usepackage{courier}
+
+\usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+
+% For including images
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\usepackage{grffile}
+
+%Change margins
+\usepackage[hmargin=1.3cm, vmargin=2.25cm]{geometry}
+
+\lstset{
+language=Java,
+captionpos=t,
+tabsize=3,
+frame=lines,
+frame=b,
+basicstyle=\footnotesize\ttfamily,
+breaklines=true, 
+keywordstyle=\color{blue},
+commentstyle=\color{green},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny,
+numbersep=5pt,
+breaklines=true,
+showstringspaces=false,
+emph={label}}
+
+\begin{document}
+\begin{titlepage}
+\title
+{
+CS2031 Telecommunications\\
+Assignment 3\\
+Snapchat Application
+}
+\author{David Kelly, Maciej Grabowski, Neil Hickey, Donal Meehan}
+\date{\today}
+\maketitle
+
+\thispagestyle{empty}
+
+\end{titlepage}
+
+\tableofcontents
+
+\thispagestyle{empty}
+
+\pagebreak
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+%Start writing document here\textsl{•}
+
+\end{document}
