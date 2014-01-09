@@ -26,11 +26,8 @@ public class ChatContainer extends JPanel{
 	
 	public ChatContainer(){
 		this.setPreferredSize(new Dimension(WIDTH,HEIGHT));
-		image = new ImageIcon("C:\\Users\\mashikag\\Desktop\\ja.jpg");
+		image = new ImageIcon();
 		label = new JLabel();
-		displayImage(image);
-		image = new ImageIcon("C:\\Users\\mashikag\\Desktop\\jacob.jpg");
-		displayImage(image);
 		this.add(label);
 	}
 	
