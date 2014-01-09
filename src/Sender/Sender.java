@@ -74,9 +74,9 @@ public class Sender {
 	 * Adds the image data from the file to the sender's buffer of data to send.
 	 * @param filename
 	 */
-	public void getImageFromFile(String filename){
+	public void getImageFromFile(File file){
+		assert(file != null);
 		try {
-			File file = new File(filename);
 			//Create buffer to be length of file
 			dataToSend = new byte[(int) file.length()];
 			FileInputStream fileInput = new FileInputStream(file);
@@ -139,5 +139,12 @@ public class Sender {
 	 */
 	public SENDER_STATE getState(){
 		return state;
+	}
+
+	/**
+	 * @return Returns integer percentage progress of sending an image.
+	 */
+	public int getPercentageProgress(){
+		return (dataToSend.length / dataBytesSent) * 100;
 	}
 }

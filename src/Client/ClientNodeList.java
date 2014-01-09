@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import tcdIO.*;
 
 /**
  * Interface to manage a group of ClientNode members on a multicast network.
@@ -14,14 +13,12 @@ public class ClientNodeList {
 	private HashMap<Integer, ClientNode> nodeList;
 	// The local client ID
 	private Identifier myID;
-	private Terminal terminal;
 
 	/**
 	 * ClientNodeList Constructor.
 	 * @param ID
 	 */
-	public ClientNodeList(Identifier ID, Terminal terminal){
-		this.terminal = terminal;
+	public ClientNodeList(Identifier ID){
 		nodeList = new HashMap<Integer, ClientNode>();
 		myID = new Identifier(ID);
 	} // end ClientNodeList constructor
@@ -31,7 +28,6 @@ public class ClientNodeList {
 	 * @param otherList
 	 */
 	public ClientNodeList(ClientNodeList otherList){
-		this.terminal = otherList.getTerminal();
 		this.myID = getMyID();
 		nodeList = new HashMap<Integer, ClientNode>();
 		nodeList.putAll(otherList.getMap());
@@ -63,8 +59,8 @@ public class ClientNodeList {
 	public void add(ClientNode node){
 		if(!clientNodeLookup(node) && !myID.equals(node.getID())){
 			nodeList.put(node.getID().getIdentifier(), node);
-			terminal.println("Client added " + node.getID().toString());
-			terminal.println(node.toString());
+			System.out.println("Client added " + node.getID().toString());
+			System.out.println(node.toString());
 		} // end if
 	} // end add method
 
@@ -122,15 +118,7 @@ public class ClientNodeList {
 	public HashMap<Integer, ClientNode> getMap(){
 		return nodeList;
 	} // end HashMap method
-
-	/**
-	 * Returns reference to terminal.
-	 * @return
-	 */
-	public Terminal getTerminal(){
-		return terminal;
-	} // end getTerminal method
-
+	
 	/**
 	 * Updates the ack stored in the ClientNode mapped to ID.
 	 * @param ID

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.swing.ImageIcon;
+
 
 /**
  * The ReceiverBuffer class takes care of storing the data being received in packets.
@@ -41,6 +43,15 @@ public class ReceiverBuffer {
 		}
 	}
 	
+	/**
+	 * Returns the received Image from the buffer in the form of an ImageIcon
+	 * @return ImageIcon
+	 */
+	public ImageIcon getReceivedImage(){
+		assert(this.state == BUFFER_STATE.COMPLETE);
+		return new ImageIcon(fileBuffer);
+	}
+	
 	private void readData(byte data[]){
 		/* Reads the data byte array and adds it to the filebuffer
 		 * Which will later be written out to file.
@@ -74,4 +85,10 @@ public class ReceiverBuffer {
 		return state == BUFFER_STATE.COMPLETE;
 	}
 	
+	/**
+	 * @return Returns progress as a percentage of the amount of bytes received.
+	 */
+	public int getPercentageProgress(){
+		return (dataReceivedSize / sizeOfData) * 100;
+	}
 }
