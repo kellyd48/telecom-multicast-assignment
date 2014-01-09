@@ -92,7 +92,7 @@ public class GraphicalUserInterface {
 		frame.add(panel);
 		frame.pack();
 		
-		frame.setResizable(true);
+		frame.setResizable(false);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -129,6 +129,7 @@ public class GraphicalUserInterface {
 	 * @param	srcImg	the source image is the image of type ImageIcon that will be displayed when the method is ran.
 	 * */
 	public void displayImage(ImageIcon srcImg){ 
+		System.out.println(srcImg.getIconWidth()+"x"+srcImg.getIconHeight());
 		chatContainer.displayImage(srcImg);
 	}
 	

@@ -29,6 +29,9 @@ public class ButtonsContainer extends JPanel{
 	
 	public ButtonsContainer( GraphicalUserInterface graphicalUserInterface,ChatContainer cc) {
 		self = this;
+		
+		sharedImage = new ImageIcon();
+		
 		this.gui = graphicalUserInterface;
 		this.chatContainer = cc;
 		
@@ -83,7 +86,7 @@ public class ButtonsContainer extends JPanel{
 					}
 					System.out.println("FilePath:"+urlForSharedImage.toString());
 					gui.setState(GraphicalUserInterface.IMAGE_SHARED);
-					sharedImage = chatContainer.createImageIcon(urlForSharedImage, "");
+					sharedImage = new ImageIcon("C://Users/mashikag/Documents/maciej.jpg");
 				}
 			}
 		});

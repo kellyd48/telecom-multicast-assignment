@@ -17,7 +17,7 @@ public class guiTestApp {
 		guiTestApp gui = new guiTestApp();
 		gui.setMessage("HI");
 		gui.setProgress(10);
-		gui.setMessage("");
+		gui.setMessage("Waiting to share an image...");
 		gui.setProgress(0);
 		while(true){
 			gui.getImage();
@@ -33,10 +33,12 @@ public class guiTestApp {
 	}
 	
 	public void getImage(){
-		ImageIcon image = gui.getSharedImage();
-		if(image != null){
+		if(gui.getState()==gui.IMAGE_SHARED){
+			ImageIcon image = gui.getSharedImage();
+			System.out.println(image.getIconWidth()+"x"+image.getIconHeight());
 			gui.displayImage(image);
-		}else
-			System.out.println("No valid image");
+		}else{
+			System.out.println("No valid image....");
+		}
 	}
 }
