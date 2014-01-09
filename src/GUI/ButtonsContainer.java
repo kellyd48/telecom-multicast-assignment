@@ -17,6 +17,8 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.sun.org.apache.xerces.internal.util.URI;
+
 public class ButtonsContainer extends JPanel{
 	private ButtonsContainer self;
 	private GraphicalUserInterface gui;
@@ -85,8 +87,8 @@ public class ButtonsContainer extends JPanel{
 						e.printStackTrace();
 					}
 					System.out.println("FilePath:"+urlForSharedImage.toString());
+					sharedImage = new ImageIcon(urlForSharedImage);
 					gui.setState(GraphicalUserInterface.IMAGE_SHARED);
-					sharedImage = new ImageIcon("C://Users/mashikag/Documents/maciej.jpg");
 				}
 			}
 		});
