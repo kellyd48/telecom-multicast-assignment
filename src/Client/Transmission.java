@@ -19,7 +19,7 @@ public abstract class Transmission {
 	protected Identifier ID;
 	private static int progress = 0;
 	//gui
-	private GraphicalUserInterface gui;
+	protected GraphicalUserInterface gui;
 	private long lastTimeUpdated = 0;
 
 	/**
@@ -55,10 +55,6 @@ public abstract class Transmission {
 	 */
 	public synchronized void setProgress(int progress){
 		Transmission.progress = progress;
-	}
-	
-	public synchronized String getImageToSend(){
-		
 	}
 
 	public synchronized void updateGUI(){

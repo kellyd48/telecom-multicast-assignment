@@ -212,4 +212,13 @@ public class GraphicalUserInterface {
 	public ImageIcon getSharedImage(){ 
 		return buttonsContainer.getSharedImage();
 	}
+
+	/**
+	 * Returns a file that has been shared by the user using the share button.
+	 * Returns null if no file has been shared.
+	 * @return
+	 */
+	public File getSharedImageFile(){
+		return buttonsContainer.getSharedFile();
+	}
 }

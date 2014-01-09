@@ -1,6 +1,5 @@
 package Client;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -60,6 +59,7 @@ public class Sending extends Transmission implements Runnable {
 					//waiting for image to send
 					//send hello packet at certain intervals
 					if(checkForImage()){
+						setImageToSend();
 						updateSenderNodeList();
 						runSender();
 						state.set(ClientState.State.SENDING_IMAGE);
@@ -112,24 +112,40 @@ public class Sending extends Transmission implements Runnable {
 		} // end while
 	} // end run method
 
-	private boolean checkForImage(){
-		//check for image in a directory
-		//if present put it in the byte array of dataToSend.
-		File imageFile = new File(Client.IMAGE_FILENAME);
-		if(imageFile.exists() && s.getState() == Sender.SENDER_STATE.WAIT_FOR_IMAGE){
-			s.getImageFromFile(Client.IMAGE_FILENAME);
-			File renamedFile;
-			int i = 0;
-			do{
-				String append = (i == 0 ? "":"_"+i);
-				renamedFile = new File(this.ID.toString() + append + ".jpg");
-				i++;
-			}while(renamedFile.isFile());
-			imageFile.renameTo(renamedFile);
-			return true;
-		}
-		return false;
+	/**
+	 * Gets shared image file from the gui and passes it to the sender.
+	 */
+	public void setImageToSend(){
+		s.getImageFromFile(gui.getSharedImageFile());
+		gui.setState(GUI.GraphicalUserInterface.DEFAULT_STATE);
 	}
+	
+	/**
+	 * Checks the gui if there is an image to send.
+	 * @return Boolean
+	 */
+	private boolean checkForImage(){
+		return (gui.getState() == GUI.GraphicalUserInterface.IMAGE_SHARED_STATE);
+	}
+	
+//	private boolean checkForLocalImage(){
+//		//check for image in local directory
+//		//if present put it in the byte array of dataToSend.
+//		File imageFile = new File(Client.IMAGE_FILENAME);
+//		if(imageFile.exists() && s.getState() == Sender.SENDER_STATE.WAIT_FOR_IMAGE){
+//			s.getImageFromFile(Client.IMAGE_FILENAME);
+//			File renamedFile;
+//			int i = 0;
+//			do{
+//				String append = (i == 0 ? "":"_"+i);
+//				renamedFile = new File(this.ID.toString() + append + ".jpg");
+//				i++;
+//			}while(renamedFile.isFile());
+//			imageFile.renameTo(renamedFile);
+//			return true;
+//		}
+//		return false;
+//	}
 
 	/**
 	 * Send hello packets

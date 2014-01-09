@@ -74,9 +74,9 @@ public class Sender {
 	 * Adds the image data from the file to the sender's buffer of data to send.
 	 * @param filename
 	 */
-	public void getImageFromFile(String filename){
+	public void getImageFromFile(File file){
+		assert(file != null);
 		try {
-			File file = new File(filename);
 			//Create buffer to be length of file
 			dataToSend = new byte[(int) file.length()];
 			FileInputStream fileInput = new FileInputStream(file);
