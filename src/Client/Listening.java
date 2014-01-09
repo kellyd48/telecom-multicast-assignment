@@ -5,6 +5,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+import javax.swing.ImageIcon;
+
 import Client.Client.ClientState;
 import GUI.GraphicalUserInterface;
 import Receiver.*;
@@ -87,6 +89,7 @@ public class Listening extends Transmission implements Runnable {
 						r.run(packetData);
 						sendAckResponse(Ack.nextExpectedAck(r.getAck()));
 						if(r.getState() == Receiver.RECEIVER_STATE.FINISHED_RECEIVING){
+							displayImageGUI(r.getReceivedImageIcon());
 							receivingFrom = null;
 							this.state.set(ClientState.State.JOIN_GROUP);
 						}
@@ -114,6 +117,14 @@ public class Listening extends Transmission implements Runnable {
 		}
 	} // end receivePacket method
 
+	/**
+	 * Displays received image in the gui.
+	 * @param image
+	 */
+	private synchronized void displayImageGUI(ImageIcon image){
+		gui.displayImage(image);
+	}
+	
 	/**
 	 * Sends an ACK over the multicast socket.
 	 * @param ID

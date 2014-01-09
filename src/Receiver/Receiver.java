@@ -2,6 +2,7 @@ package Receiver;
 
 import java.io.File;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -43,11 +44,7 @@ public class Receiver extends JPanel{
 						this.ack.next();
 						buffer.run(Multicast.getData(packetReceived));
 						if(buffer.isComplete()) {
-							JFrame frame = new JFrame("Client ID: " + id.toString());
-							ImageDisplay panel = new ImageDisplay(outputFileName);
-							frame.getContentPane().add(panel);
-							frame.setSize(500, 500);
-							frame.setVisible(true);
+							displayImageJPanel();
 							state = RECEIVER_STATE.FINISHED_RECEIVING;
 						}
 					}
@@ -56,6 +53,25 @@ public class Receiver extends JPanel{
 					break;
 			}
 		}
+	}
+	
+	/**
+	 * Returns the received image from the buffer as an ImageIcon.
+	 * @return
+	 */
+	public ImageIcon getReceivedImageIcon(){
+		return buffer.getReceivedImage();
+	}
+	
+	/**
+	 * Creates a popup window with the received image.
+	 */
+	private void displayImageJPanel(){
+		JFrame frame = new JFrame("Client ID: " + id.toString());
+		ImageDisplay panel = new ImageDisplay(outputFileName);
+		frame.getContentPane().add(panel);
+		frame.setSize(500, 500);
+		frame.setVisible(true);
 	}
 
 	private String newOutputFilename(){
