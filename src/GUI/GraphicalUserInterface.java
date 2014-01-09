@@ -183,11 +183,13 @@ public class GraphicalUserInterface {
 	}
 	
 	/**
+	 * @see!!!!!!!DISABLED!!!!!!!
 	 * Sets progress of the progress bar to a given value. 
 	 * @param	progress	The progress value has to be in the range: minValue <= progress <= maxValue .
 	 * */
 	public void setProgress(int progress){ 
-		progressBarContainer.setProgress(progress);
+		//disable setProgress until errors are fixed
+		//progressBarContainer.setProgress(progress);
 	}
 	
 	/**
